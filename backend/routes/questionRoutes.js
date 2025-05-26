@@ -4,9 +4,9 @@ const {protect} = require("../middlewares/authMiddleware")
 
 const router = express.Router()
 
-router.post("/add", addQuestionsToSession)
-router.post("/:id/pin", togglePinQuestion)
-router.post("/:id/note", updateQuestionNote)
+router.post("/add", protect, addQuestionsToSession)
+router.post("/:id/pin", protect, togglePinQuestion)
+router.post("/:id/note", protect, updateQuestionNote)
 
 
 module.exports = router
