@@ -1,0 +1,37 @@
+require('dotenv').config()
+const express = require('express')
+const cors = require('cors')
+const path = require('path')
+const connectDB = require('./config/db')
+
+const app = express()
+
+app.use(cors({origin: "*", allowedHeaders: ["Content-Type", "Authorization"]}))
+
+connectDB()
+
+// Middlewares
+app.use(express.json())
+
+// Routes
+const authRoutes = require("./routes/authRoutes")
+const sessionRoutes = require("./routes/sessionRoutes")
+const questionRoutes = require("./routes/questionRoutes")
+const { protect } = require('./middlewares/authMiddleware')
+const {} = require("./controllers/aiController")
+
+app.use("/api/auth", authRoutes)
+app.use("/api/session", sessionRoutes)
+app.use("/api/question", questionRoutes)
+
+// app.use("/api/ai/generate-questions", protect, generateInterviewQuestions)
+// app.use("/api/ai/generate-explanation", protect, generateConceptExplanation)
+
+// serve upload folder
+app.use("/uploads", express.static(path.join(__dirname, "uploads"), {}))
+
+// Start server
+const PORT = process.env.PORT || 5000
+app.listen(PORT, ()=>{
+    console.log("Server is running on port", PORT);
+})
