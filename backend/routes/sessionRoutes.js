@@ -4,9 +4,9 @@ const {protect} = require("../middlewares/authMiddleware")
 
 const router = express.Router()
 
-router.post("/create", createSession)
-router.get("/my-session", getMySessions)
-router.get("/:id", getSessionById)
-router.delete("/:id", deleteSession)
+router.post("/create", protect, createSession)
+router.get("/my-session", protect, getMySessions)
+router.get("/:id", protect, getSessionById)
+router.delete("/:id", protect, deleteSession)
 
 module.exports = router
