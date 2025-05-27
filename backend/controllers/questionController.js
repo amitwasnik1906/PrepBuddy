@@ -1,5 +1,6 @@
 const Session = require("../models/sessionModel")
 const Question = require("../models/questionModel")
+const ApiResponse = require("../utils/apiResponse")
 
 const addQuestionsToSession = async (req, res) => {
     try {

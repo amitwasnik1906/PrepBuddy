@@ -51,6 +51,8 @@ function InterviewPrep() {
   const handlePinQuestion = async (questionId) => {
     try {
       // Add your pin API call here
+      await axiosInstance.post(API_PATHS.QUESTION.PIN(questionId))
+      await fetchSession() // Refresh session data to get updated pin status
       toast.success('Question pinned successfully')
     } catch (error) {
       toast.error('Failed to pin question')
@@ -59,7 +61,8 @@ function InterviewPrep() {
 
   const handleExplainQuestion = (questionId) => {
     // Add your explain functionality here
-    toast.info('Explain feature coming soon')
+    
+    toast.success('Explain feature coming soon')
   }
 
   if (loading) {
@@ -245,7 +248,7 @@ function InterviewPrep() {
                 onClick={() => window.location.reload()}
                 className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400"
               >
-                Review Again
+                Generate more questions
               </button>
             </div>
           </div>
