@@ -36,7 +36,7 @@ const UserProvider = ({ children }) => {
 
     const updateUser = (userDate) => {
         setUser(userDate)
-        localStorage.setItem("token", userDate.token)
+        localStorage.setItem("token", userDate.token) 
         setLoading(false)
     }
 

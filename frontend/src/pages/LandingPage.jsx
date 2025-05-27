@@ -1,14 +1,29 @@
-import React, { useState } from 'react'
-import { ChevronRight, CheckCircle, Star, Users, BookOpen, Target, ArrowRight, Menu, X } from 'lucide-react'
+import React, { useContext, useState } from 'react'
+import { ChevronRight, CheckCircle, Star, Users, BookOpen, Target, ArrowRight, Menu, X, LogIn, ImageOff } from 'lucide-react'
+import { useNavigate } from "react-router-dom"
+import Login from "../pages/Auth/Login"
+import SignUp from "../pages/Auth/SignUp"
+import Modal from '../components/modal/Modal'
+import { UserContext } from '../context/userContext'
+import ProfileInfoCard from '../components/Cards/ProfileInfoCard'
 
 function LandingPage() {
+  const { user } = useContext(UserContext)
+  const navigate = useNavigate()
+
   const [openAuthModal, setOpenAuthModal] = useState(false)
   const [currentPage, setCurrentPage] = useState('login')
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const handleCTA = () => {
-    setOpenAuthModal(true)
-    setCurrentPage('signup')
+  const handleCTA = (page) => {
+    if (!user) {
+      setOpenAuthModal(true)
+      setCurrentPage(page || "signup")
+    }
+    else {
+      navigate('/dashboard')
+    }
   }
 
   const features = [
@@ -26,7 +41,7 @@ function LandingPage() {
       icon: <Users className="w-8 h-8" />,
       title: "Structured Learning",
       description: "All content organized clearly for easy navigation and better understanding"
-    }    
+    }
   ]
 
   const testimonials = [
@@ -61,29 +76,33 @@ function LandingPage() {
                 <Target className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                PrepBuddy 
+                PrepBuddy
               </span>
             </div>
-            
+
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              
-              <button 
-                onClick={() => {setOpenAuthModal(true); setCurrentPage('login')}}
-                className="text-purple-600 hover:text-purple-700 font-medium transition-colors cursor-pointer"
-              >
-                Sign In
-              </button>
-              <button 
-                onClick={handleCTA}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
-              >
-                Get Started
-              </button>
-            </div>
+            {!user ?
+              <div className="hidden md:flex items-center space-x-8">
+                <button
+                  onClick={(e)=> handleCTA("login")}
+                  className="text-purple-600 hover:text-purple-700 font-medium transition-colors cursor-pointer"
+                >
+                  LogIn
+                </button>
+                <button
+                  onClick={(e)=> handleCTA("signup")}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
+                >
+                  SignUp
+                </button>
+              </div> :
+              <div>
+                <ProfileInfoCard/>
+              </div>
+            }
 
             {/* Mobile menu button */}
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2"
             >
@@ -99,14 +118,14 @@ function LandingPage() {
               <a href="#features" className="block text-gray-600 hover:text-purple-600 transition-colors">Features</a>
               <a href="#testimonials" className="block text-gray-600 hover:text-purple-600 transition-colors">Testimonials</a>
               <a href="#pricing" className="block text-gray-600 hover:text-purple-600 transition-colors">Pricing</a>
-              <button 
-                onClick={() => {setOpenAuthModal(true); setCurrentPage('login')}}
+              <button
+                onClick={() => { setOpenAuthModal(true); setCurrentPage('login') }}
                 className="block w-full text-left text-purple-600 hover:text-purple-700 font-medium transition-colors "
               >
                 Sign In
               </button>
-              <button 
-                onClick={handleCTA}
+              <button
+                onClick={(e)=> handleCTA("login")}
                 className="block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-200"
               >
                 Get Started
@@ -129,12 +148,12 @@ function LandingPage() {
               <span className="text-gray-800">Interview</span>
             </h1>
             <p className="text-xl lg:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Master technical and behavioral interviews with AI-powered practice, 
+              Master technical and behavioral interviews with AI-powered practice,
               Structured company-specific questions and AI-powered Insights
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-              <button 
-                onClick={handleCTA}
+              <button
+                onClick={(e)=> handleCTA("login")}
                 className="group bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
               >
                 <span>Start Practicing Free</span>
@@ -145,7 +164,7 @@ function LandingPage() {
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
-            
+
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
@@ -176,18 +195,18 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
-              Everything You Need to 
+              Everything You Need to
               <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"> Succeed</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Our comprehensive platform combines AI-powered practice with human expertise 
+              Our comprehensive platform combines AI-powered practice with human expertise
               to give you the edge in any interview.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-purple-100"
               >
@@ -207,15 +226,15 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
-              Loved by 
+              Loved by
               <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Professionals</span>
             </h2>
             <p className="text-xl text-gray-600">See what our users say about their interview success</p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div 
+              <div
                 key={index}
                 className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-purple-100"
               >
@@ -244,8 +263,8 @@ function LandingPage() {
           <p className="text-xl text-purple-100 mb-10">
             Join thousands of professionals who've successfully aced their interviews with our platform.
           </p>
-          <button 
-            onClick={handleCTA}
+          <button
+            onClick={(e)=> handleCTA("login")}
             className="bg-white text-purple-600 px-10 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center space-x-2"
           >
             <span>Start Your Preparation</span>
@@ -300,14 +319,21 @@ function LandingPage() {
         </div>
       </footer>
 
-      {/* Auth Modal (placeholder) */}
-      {openAuthModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full">
-            
-          </div>
+      {/* show login or signup page using Modal */}
+      <Modal
+        isOpen={openAuthModal}
+        onClose={() => {
+          setOpenAuthModal(false)
+          setCurrentPage('login')
+        }}
+        hideHeader
+      >
+        <div>
+          {currentPage === 'login' && (<Login setCurrentPage={setCurrentPage} />)}
+          {currentPage === 'signup' && (<SignUp setCurrentPage={setCurrentPage} />)}
         </div>
-      )}
+      </Modal>
+
     </div>
   )
 }

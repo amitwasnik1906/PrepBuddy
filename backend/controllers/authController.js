@@ -106,7 +106,7 @@ const uploadImage =  (req, res)=>{
 
         const imageUrl = req.file.path
         
-        res.status(200).json( new ApiResponse(200, null, imageUrl));
+        res.status(200).json( new ApiResponse(200, null, {imageUrl}));
     } catch (error) {
         console.error("Error uploading image:", error);
         res.status(500).json({ message: "Error uploading image" });
