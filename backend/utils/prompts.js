@@ -21,7 +21,7 @@ const interviewQuestionsPrompt = (role, experience, topicsToFocus, numberOfQuest
     `)
 
 
-const conceptExplanationPrompt = () => (`
+const conceptExplanationPrompt = (question) => (`
     You are an AI trained to generate explanations for a given interview question. 
 
     Task: 
@@ -39,3 +39,4 @@ const conceptExplanationPrompt = () => (`
     Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
 `)
 
+module.exports = {interviewQuestionsPrompt, conceptExplanationPrompt}

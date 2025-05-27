@@ -19,11 +19,11 @@ const generateInterviewQuestions = async (req, res) => {
             contents: prompt
         })
 
-        let rawText = response.text
 
-        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```/, "").trim()
+        let rawText = response.candidates[0].content.parts[0].text
 
-        const data = JSON.parse(cleanedText)
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
 
         res.status(200).json(new ApiResponse(200, "Interview questions generated successfully", { interviewQuestions: data }))
 
@@ -47,11 +47,10 @@ const generateConceptExplanation = async (req, res) => {
             contents: prompt
         })
 
-        let rawText = response.text
+        let rawText = response.candidates[0].content.parts[0].text
 
-        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```/, "").trim()
-
-        const data = JSON.parse(cleanedText)
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
 
         res.status(200).json(new ApiResponse(200, "Concept explanation generated successfully", { explanation: data }))
     } catch (error) {
