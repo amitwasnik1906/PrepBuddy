@@ -25,7 +25,7 @@ app.use("/api/session", sessionRoutes)
 app.use("/api/question", questionRoutes)
 
 app.use("/api/ai/generate-questions", protect, generateInterviewQuestions)
-app.use("/api/ai/generate-explanation", protect, generateConceptExplanation)
+app.use("/api/ai/generate-explaination", protect, generateConceptExplanation)
 
 // serve upload folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads"), {}))
