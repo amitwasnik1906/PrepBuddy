@@ -17,7 +17,7 @@ const createSession = async (req, res)=>{
         })
     
         const questionDocs = await Promise.all(
-            questions.map(async (q) => {
+            questions?.map(async (q) => {
                 const question = await Question.create({
                     session: session._id,
                     question: q.question,
@@ -60,7 +60,6 @@ const getSessionById = async (req, res)=>{
 
         const session = await Session.findById(id)
             .populate('questions')
-            .select('-user')
 
         if (session.user.toString() !== userId.toString()) {
             return res.status(403).json(

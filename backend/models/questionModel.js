@@ -9,7 +9,7 @@ const questionSchema = new mongoose.Schema(
         isPinned: {type: Boolean, default: false}
     },
     {
-        timestimestamps: true
+        timestamps: true
     }
 )
 
