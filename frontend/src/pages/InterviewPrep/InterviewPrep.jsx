@@ -4,17 +4,20 @@ import { toast } from 'react-hot-toast'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import DashboardLayout from '../../components/Layouts/DashboardLayout'
-import { 
-  LucideArrowLeft, 
-  LucidePin, 
-  LucideMessageCircle, 
-  LucideChevronDown, 
+import {
+  LucideArrowLeft,
+  LucidePin,
+  LucideMessageCircle,
+  LucideChevronDown,
   LucideChevronUp,
   LucideUser,
   LucideTarget,
   LucideCalendar,
   LucideFileText
 } from 'lucide-react'
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 function InterviewPrep() {
   const { sessionId } = useParams()
@@ -23,6 +26,7 @@ function InterviewPrep() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [expandedQuestions, setExpandedQuestions] = useState({})
+  const [animatingQuestions, setAnimatingQuestions] = useState(new Set())
 
   useEffect(() => {
     fetchSession()
@@ -32,7 +36,9 @@ function InterviewPrep() {
     try {
       setLoading(true)
       const response = await axiosInstance.get(API_PATHS.SESSION.GET_ONE(sessionId))
-      setSession(response.data.data.session)
+      let session = response.data.data.session
+
+      setSession(session)
     } catch (error) {
       toast.error('Failed to fetch session')
       console.error(error)
@@ -40,6 +46,16 @@ function InterviewPrep() {
       setLoading(false)
     }
   }
+
+  // Sort questions: pinned first, then by updatedAt (most recent first)
+  const sortedQuestions = session?.questions ? [...session.questions].sort((a, b) => {
+    // First priority: pinned status
+    if (a.isPinned && !b.isPinned) return -1
+    if (!a.isPinned && b.isPinned) return 1
+
+    // Second priority: most recently updated first
+    return new Date(b.updatedAt) - new Date(a.updatedAt)
+  }) : []
 
   const toggleQuestion = (questionId) => {
     setExpandedQuestions(prev => ({
@@ -50,19 +66,39 @@ function InterviewPrep() {
 
   const handlePinQuestion = async (questionId) => {
     try {
-      // Add your pin API call here
+      // Add animation class
+      setAnimatingQuestions(prev => new Set([...prev, questionId]))
+
       await axiosInstance.post(API_PATHS.QUESTION.PIN(questionId))
-      await fetchSession() // Refresh session data to get updated pin status
-      toast.success('Question pinned successfully')
+
+      // Wait for animation to complete before updating data
+      setTimeout(async () => {
+        await fetchSession() // Refresh session data to get updated pin status
+        setAnimatingQuestions(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(questionId)
+          return newSet
+        })
+        toast.success('Question pinned successfully')
+      }, 800) // Animation duration
+
     } catch (error) {
+      setAnimatingQuestions(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(questionId)
+        return newSet
+      })
       toast.error('Failed to pin question')
     }
   }
 
   const handleExplainQuestion = (questionId) => {
     // Add your explain functionality here
-    
     toast.success('Explain feature coming soon')
+  }
+
+  const handleAddQuestionsToSession = () => {
+    toast.success('adding more questions')
   }
 
   if (loading) {
@@ -97,17 +133,17 @@ function InterviewPrep() {
             <LucideArrowLeft size={20} />
             Back to Sessions
           </button>
-          
+
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div className="flex items-start gap-6">
               <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold">
                 {session.role.split(' ').map(word => word[0]).join('').toUpperCase()}
               </div>
-              
+
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{session.role}</h1>
                 <p className="text-gray-600 mb-4">{session.description}</p>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
                     <LucideUser size={18} className="text-purple-500" />
@@ -116,7 +152,7 @@ function InterviewPrep() {
                       <p className="text-sm text-gray-600">{session.experience} years</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
                     <LucideTarget size={18} className="text-purple-500" />
                     <div>
@@ -124,7 +160,7 @@ function InterviewPrep() {
                       <p className="text-sm text-gray-600">{session.topicsToFocus}</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
                     <LucideFileText size={18} className="text-purple-500" />
                     <div>
@@ -141,93 +177,143 @@ function InterviewPrep() {
         {/* Questions Section */}
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Interview Questions</h2>
-          
-          {session.questions.map((question, index) => (
-            <div
-              key={question._id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-            >
-              {/* Question Header */}
-              <div className="flex items-center justify-between p-6 bg-gray-50 border-b border-gray-100">
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="bg-purple-100 text-purple-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">
-                    {index + 1}
-                  </div>
-                  
-                  <button
-                    onClick={() => toggleQuestion(question._id)}
-                    className="flex-1 text-left"
-                  >
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                      {question.question}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Click to {expandedQuestions[question._id] ? 'hide' : 'view'} answer
-                    </p>
-                  </button>
-                  
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handlePinQuestion(question._id)
-                      }}
-                      className={`p-2 rounded-lg transition-colors ${
-                        question.isPinned 
-                          ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                      title="Pin question"
-                    >
-                      <LucidePin size={18} />
-                    </button>
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleExplainQuestion(question._id)
-                      }}
-                      className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
-                      title="Get explanation"
-                    >
-                      <LucideMessageCircle size={18} />
-                    </button>
-                    
+
+          {sortedQuestions.map((question, index) => {
+            const isAnimating = animatingQuestions.has(question._id)
+            const isPinned = question.isPinned
+
+            return (
+              <div
+                key={question._id}
+                className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-all duration-300 ease-in-out ${isPinned
+                  ? 'border-yellow-200 shadow-lg ring-2 ring-yellow-100'
+                  : 'border-gray-100'
+                  } ${isAnimating
+                    ? 'transform scale-105 shadow-xl ring-4 ring-yellow-200'
+                    : ''
+                  }`}
+                style={{
+                  transform: isAnimating ? 'translateY(-10px) scale(1.02)' : 'translateY(0) scale(1)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+              >
+
+                {/* Question Header */}
+                <div className={`flex items-center justify-between p-6 ${isPinned ? 'bg-yellow-50' : 'bg-gray-50'} border-b border-gray-100`}>
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold ${isPinned
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : 'bg-purple-100 text-purple-600'
+                      }`}>
+                      {index + 1}
+                    </div>
+
                     <button
                       onClick={() => toggleQuestion(question._id)}
-                      className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                      className="flex-1 text-left"
                     >
-                      {expandedQuestions[question._id] ? (
-                        <LucideChevronUp size={18} />
-                      ) : (
-                        <LucideChevronDown size={18} />
-                      )}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        {question.question}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Click to {expandedQuestions[question._id] ? 'hide' : 'view'} answer
+                      </p>
                     </button>
-                  </div>
-                </div>
-              </div>
 
-              {/* Answer Section */}
-              {expandedQuestions[question._id] && (
-                <div className="p-6">
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <LucideMessageCircle size={20} className="text-blue-500" />
-                      Answer
-                    </h4>
-                    <div className="prose max-w-none">
-                      <div 
-                        className="text-gray-700 leading-relaxed whitespace-pre-wrap"
-                        dangerouslySetInnerHTML={{ 
-                          __html: question.answer.replace(/\n/g, '<br/>').replace(/\*(.*?)\*/g, '<strong>$1</strong>') 
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handlePinQuestion(question._id)
                         }}
-                      />
+                        disabled={isAnimating}
+                        className={`p-2 rounded-lg transition-all duration-200 ${isPinned
+                          ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 shadow-sm'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          } ${isAnimating ? 'animate-pulse' : ''
+                          }`}
+                        title={isPinned ? "Unpin question" : "Pin question"}
+                      >
+                        <LucidePin
+                          size={18}
+                          className={`transition-transform duration-200 ${isAnimating ? 'rotate-12' : ''
+                            }`}
+                        />
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleExplainQuestion(question._id)
+                        }}
+                        className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+                        title="Get explanation"
+                      >
+                        <LucideMessageCircle size={18} />
+                      </button>
+
+                      <button
+                        onClick={() => toggleQuestion(question._id)}
+                        className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                      >
+                        {expandedQuestions[question._id] ? (
+                          <LucideChevronUp size={18} />
+                        ) : (
+                          <LucideChevronDown size={18} />
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* Answer Section */}
+                {expandedQuestions[question._id] && (
+                  <div className="">
+                    <div
+                      className={`rounded-lg p-6 ${isPinned
+                          ? 'bg-gradient-to-r from-yellow-50 to-amber-50'
+                          : 'bg-white border border-gray-200'
+                        }`}
+                    >
+                      <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <LucideMessageCircle size={20} className={isPinned ? 'text-yellow-600' : 'text-blue-500'} />
+                        Answer
+                      </h4>
+                      <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        <ReactMarkdown
+                          components={{
+                            code({ node, inline, className, children, ...props }) {
+                              const match = /language-(\w+)/.exec(className || '');
+                              return !inline && match ? (
+                                <div className="my-4 rounded-md overflow-hidden bg-gray-50 border border-gray-200">
+                                  <div className="px-4 py-2 bg-gray-100 border-b border-gray-200 text-xs text-gray-600 font-mono">
+                                    {match[1]}
+                                  </div>
+                                  <pre className="p-4 overflow-x-auto">
+                                    <code className={`language-${match[1]}`} {...props}>
+                                      {children}
+                                    </code>
+                                  </pre>
+                                </div>
+                              ) : (
+                                <code className="bg-gray-100 rounded px-1.5 py-0.5 text-sm font-mono">
+                                  {children}
+                                </code>
+                              );
+                            }
+                          }}
+                        >
+                          {question.answer}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+
+              </div>
+            )
+          })}
         </div>
 
         {/* Summary Footer */}
@@ -245,8 +331,8 @@ function InterviewPrep() {
                 Back to Dashboard
               </button>
               <button
-                onClick={() => window.location.reload()}
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400"
+                onClick={() => handleAddQuestionsToSession()}
+                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400 cursor-pointer"
               >
                 Generate more questions
               </button>
