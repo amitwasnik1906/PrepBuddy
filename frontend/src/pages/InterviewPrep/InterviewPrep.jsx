@@ -16,6 +16,9 @@ import {
   LucideFileText
 } from 'lucide-react'
 import AiResponseCard from '../../components/Cards/AiResponseCard'
+import Explanation from './Explanation'
+import Drawer from '../../components/modal/Drawer'
+import ExplanationSkeletonLoader from '../../components/Loaders/ExplanationSkeletonLoader'
 
 function InterviewPrep() {
   const { sessionId } = useParams()
@@ -26,9 +29,10 @@ function InterviewPrep() {
   const [expandedQuestions, setExpandedQuestions] = useState({})
   const [animatingQuestions, setAnimatingQuestions] = useState(new Set())
 
+  const [explanationQuestionSelected, setExplanationQuestionSelected] = useState(null)
   const [explanation, setExplanation] = useState(null)
   const [explanationLoading, setExplanationLoading] = useState(false)
-
+  const [openExplainModal, setOpenExplainModal] = useState(false)
 
 
   useEffect(() => {
@@ -95,14 +99,29 @@ function InterviewPrep() {
     }
   }
 
-  const handleExplainQuestion = (question) => {
+  const handleExplainQuestion = async (question) => {
     // Add your explain functionality here
     try {
-      setExplanationLoading(false)
+      setExplanationLoading(true)
+      setOpenExplainModal(true)
+      setExplanationQuestionSelected(question)
 
-      // call api generate-explaination
-      console.log(question);
+      // api call generate-explaination
+      const response = await axiosInstance.post(API_PATHS.AI.GENERATE_EXPLAINATION, {
+        question: question
+      })
 
+      if (response.data.success) {
+        setExplanation(response.data.data.explanation)
+      }
+
+      // // Simulate loading for 5 seconds
+      // await new Promise(resolve => setTimeout(resolve, 3000))
+      // const explanation = {
+      //   "title": "Styling React Components: A Beginner's Guide",
+      //   "explanation": "The question \"What are the different ways to style components in React?\" is fundamental to understanding how to visually customize your React applications. React itself doesn't dictate a specific styling method; instead, it provides flexibility, allowing developers to choose approaches that suit their project's needs and preferences. Here's a breakdown of common methods:\n\n1.  **Inline Styles:** This is the most basic method. You directly apply styles to an element within the component's JSX using the `style` attribute. The value of `style` is a JavaScript object where keys are CSS properties (e.g., `color`, `fontSize`) and values are their corresponding values. While easy for simple styling, inline styles become cumbersome and less maintainable for more complex designs.\n\n    ```javascript\n    function MyComponent() {\n      return (\n        <div style={{ color: 'blue', fontSize: '16px' }}>\n          Hello, React!\n        </div>\n      );\n    }\n    ```\n\n2.  **CSS Stylesheets (External Stylesheets):** This is the most common and recommended approach for larger projects. You create separate `.css` files and import them into your React components. This separation of concerns makes your code cleaner and easier to maintain. It allows you to leverage the full power of CSS, including selectors, media queries, and more.\n\n    ```javascript\n    // MyComponent.jsx\n    import './MyComponent.css';\n\n    function MyComponent() {\n      return <div className=\"my-component\">Hello, React!</div>;\n    }\n\n    // MyComponent.css\n    .my-component {\n      color: blue;\n      font-size: 16px;\n    }\n    ```\n\n3.  **CSS Modules:** CSS Modules provide a more scoped approach to CSS. They automatically generate unique class names for your CSS rules, preventing naming conflicts. This enhances modularity and avoids unintentional style overrides. The import of a CSS Module gives you an object whose properties are the locally scoped class names.\n\n    ```javascript\n    // MyComponent.jsx\n    import styles from './MyComponent.module.css';\n\n    function MyComponent() {\n      return <div className={styles.myComponent}>Hello, React!</div>;\n    }\n\n    // MyComponent.module.css\n    .myComponent {\n      color: blue;\n      font-size: 16px;\n    }\n    ```\n\n4.  **Styled Components:** Styled Components is a popular library that allows you to write CSS directly within your JavaScript files. It utilizes tagged template literals to create React components with attached styles. This approach offers better encapsulation and component-level styling, promoting reusability and readability.\n\n    ```javascript\n    import styled from 'styled-components';\n\n    const StyledDiv = styled.div`\n      color: blue;\n      font-size: 16px;\n    `;\n\n    function MyComponent() {\n      return <StyledDiv>Hello, React!</StyledDiv>;\n    }\n    ```\n\n5.  **Other CSS-in-JS Libraries:** Similar to Styled Components, other libraries like Emotion offer alternative solutions for styling components using JavaScript. They often provide similar features and advantages, allowing you to choose based on preference and project needs.\n\n6. **Inline Styles with Variables:** You can use JavaScript variables within inline styles to make them more dynamic. However, it's still generally less maintainable than CSS stylesheets.\n\nChoosing the right method depends on the project's size, complexity, and your personal preferences. For most projects, a combination of CSS stylesheets (for global styles and theming) and CSS Modules or Styled Components (for component-specific styles) is a good practice."
+      // }
+      // setExplanation(explanation)
 
       toast.success('Explain feature coming soon')
 
@@ -339,6 +358,21 @@ function InterviewPrep() {
           </div>
         </div>
       </div>
+
+      <Drawer
+        isOpen={openExplainModal}
+        onClose={() => {
+          setOpenExplainModal(false)
+        }}
+        hideHeader
+      >
+        {explanationLoading ? <ExplanationSkeletonLoader /> :
+          <Explanation
+            explanation={explanation}
+            question={explanationQuestionSelected}
+          />
+        }
+      </Drawer>
     </DashboardLayout>
   )
 }
