@@ -87,23 +87,23 @@ const deleteSession = async (req, res)=>{
         const { id } = req.params
         const userId = req.user._id
 
-        const session = await Session.findById(id)
+        // const session = await Session.findById(id)
 
-        if (!session) {
-            return res.status(404).json(
-                new ApiResponse(404, "Session not found")
-            )
-        }
+        // if (!session) {
+        //     return res.status(404).json(
+        //         new ApiResponse(404, "Session not found")
+        //     )
+        // }
 
-        if (session.user.toString() !== userId.toString()) {
-            return res.status(403).json(
-                new ApiResponse(403, "You are not authorized to delete this session")
-            )
-        }
+        // if (session.user.toString() !== userId.toString()) {
+        //     return res.status(403).json(
+        //         new ApiResponse(403, "You are not authorized to delete this session")
+        //     )
+        // }
 
-        await Question.deleteMany({ session: id })
+        // await Question.deleteMany({ session: id })
 
-        await Session.findByIdAndDelete(id)
+        // await Session.findByIdAndDelete(id)
 
         res.status(200).json(
             new ApiResponse(200, "Session deleted successfully")

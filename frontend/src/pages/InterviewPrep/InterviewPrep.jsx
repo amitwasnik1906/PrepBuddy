@@ -15,9 +15,7 @@ import {
   LucideCalendar,
   LucideFileText
 } from 'lucide-react'
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import AiResponseCard from '../../components/Cards/AiResponseCard'
 
 function InterviewPrep() {
   const { sessionId } = useParams()
@@ -27,6 +25,11 @@ function InterviewPrep() {
   const [loading, setLoading] = useState(true)
   const [expandedQuestions, setExpandedQuestions] = useState({})
   const [animatingQuestions, setAnimatingQuestions] = useState(new Set())
+
+  const [explanation, setExplanation] = useState(null)
+  const [explanationLoading, setExplanationLoading] = useState(false)
+
+
 
   useEffect(() => {
     fetchSession()
@@ -92,9 +95,27 @@ function InterviewPrep() {
     }
   }
 
-  const handleExplainQuestion = (questionId) => {
+  const handleExplainQuestion = (question) => {
     // Add your explain functionality here
-    toast.success('Explain feature coming soon')
+    try {
+      setExplanationLoading(false)
+
+      // call api generate-explaination
+      console.log(question);
+
+
+      toast.success('Explain feature coming soon')
+
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message)
+      }
+      else {
+        toast.error("Something went wrong. Try again")
+      }
+    } finally {
+      setExplanationLoading(false)
+    }
   }
 
   const handleAddQuestionsToSession = () => {
@@ -212,7 +233,7 @@ function InterviewPrep() {
                       onClick={() => toggleQuestion(question._id)}
                       className="flex-1 text-left"
                     >
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">
                         {question.question}
                       </h3>
                       <p className="text-sm text-gray-500">
@@ -244,7 +265,7 @@ function InterviewPrep() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleExplainQuestion(question._id)
+                          handleExplainQuestion(question.question)
                         }}
                         className="p-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
                         title="Get explanation"
@@ -271,41 +292,19 @@ function InterviewPrep() {
                   <div className="">
                     <div
                       className={`rounded-lg p-6 ${isPinned
-                          ? 'bg-gradient-to-r from-yellow-50 to-amber-50'
-                          : 'bg-white border border-gray-200'
+                        ? 'bg-gradient-to-r from-yellow-50 to-amber-50'
+                        : 'bg-white border border-gray-200'
                         }`}
                     >
                       <h4 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <LucideMessageCircle size={20} className={isPinned ? 'text-yellow-600' : 'text-blue-500'} />
                         Answer
                       </h4>
-                      <div className="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        <ReactMarkdown
-                          components={{
-                            code({ node, inline, className, children, ...props }) {
-                              const match = /language-(\w+)/.exec(className || '');
-                              return !inline && match ? (
-                                <div className="my-4 rounded-md overflow-hidden bg-gray-50 border border-gray-200">
-                                  <div className="px-4 py-2 bg-gray-100 border-b border-gray-200 text-xs text-gray-600 font-mono">
-                                    {match[1]}
-                                  </div>
-                                  <pre className="p-4 overflow-x-auto">
-                                    <code className={`language-${match[1]}`} {...props}>
-                                      {children}
-                                    </code>
-                                  </pre>
-                                </div>
-                              ) : (
-                                <code className="bg-gray-100 rounded px-1.5 py-0.5 text-sm font-mono">
-                                  {children}
-                                </code>
-                              );
-                            }
-                          }}
-                        >
-                          {question.answer}
-                        </ReactMarkdown>
-                      </div>
+
+                      <AiResponseCard
+                        text={question.answer}
+                      />
+
                     </div>
                   </div>
                 )}

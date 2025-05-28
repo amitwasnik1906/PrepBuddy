@@ -115,21 +115,7 @@ function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-purple-100">
             <div className="px-4 py-4 space-y-4">
-              <a href="#features" className="block text-gray-600 hover:text-purple-600 transition-colors">Features</a>
-              <a href="#testimonials" className="block text-gray-600 hover:text-purple-600 transition-colors">Testimonials</a>
-              <a href="#pricing" className="block text-gray-600 hover:text-purple-600 transition-colors">Pricing</a>
-              <button
-                onClick={() => { setOpenAuthModal(true); setCurrentPage('login') }}
-                className="block w-full text-left text-purple-600 hover:text-purple-700 font-medium transition-colors "
-              >
-                Sign In
-              </button>
-              <button
-                onClick={(e)=> handleCTA("login")}
-                className="block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all duration-200"
-              >
-                Get Started
-              </button>
+              link
             </div>
           </div>
         )}
