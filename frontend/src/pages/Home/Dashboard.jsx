@@ -8,6 +8,7 @@ import SummaryCard from '../../components/Cards/SummaryCard'
 import { LucidePlus } from 'lucide-react'
 import Modal from "../../components/modal/Modal"
 import CreateSessionForm from "./CreateSessionForm"
+import DeleteAlertContent from '../../components/content/DeleteAlertContent'
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ function Dashboard() {
     try {
       setLoading(true)
       const response = await axiosInstance.get(API_PATHS.SESSION.GET_ALL)
-      console.log(response.data.data.sessions);
+      // console.log(response.data.data.sessions);
 
       setSessions(response.data.data.sessions)
     } catch (error) {
@@ -36,12 +37,12 @@ function Dashboard() {
     }
   }
 
-  const deleteSession = async () => {
+  const deleteSession = async (sessionData) => {
     try {
-      await axiosInstance.delete(API_PATHS.SESSION.DELETE)
+      await axiosInstance.delete(API_PATHS.SESSION.DELETE(sessionData._id))
       toast.success('Session deleted successfully')
       setOpenDeleteAlert({ open: false, data: null })
-      fetchAllSessions()
+      fetchAllSessions()      
     } catch (error) {
       toast.error('Failed to delete session')
       console.error(error)
@@ -63,7 +64,7 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {sessions?.map((session) => (
               <SummaryCard
-              key={session._id}
+                key={session._id}
                 session={session}
                 onSelect={() => {
                   navigate(`/interview-prep/${session._id}`)
@@ -94,6 +95,27 @@ function Dashboard() {
       >
         <CreateSessionForm />
       </Modal>
+
+      <Modal
+        isOpen={openDeleteAlert.open}
+        onClose={() => {
+          setOpenDeleteAlert({ open: false, data: null })
+        }}
+        hideHeader
+      >
+        <DeleteAlertContent
+          content="Are you sure you want to delete this session?"
+          onDelete={() => {
+            deleteSession(openDeleteAlert.data)
+          }}
+
+          onCancel={() => {
+            setOpenDeleteAlert({ open: false, data: null })
+          }}
+        />
+      </Modal>
+
+
     </DashboardLayout>
   )
 }
