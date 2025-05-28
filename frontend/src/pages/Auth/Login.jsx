@@ -39,7 +39,6 @@ function Login({ setCurrentPage }) {
         email: formData.email,
         password: formData.password
       })
-      console.log(response.data);
       
       const token = response.data.data.token
 

@@ -34,6 +34,8 @@ function InterviewPrep() {
   const [explanationLoading, setExplanationLoading] = useState(false)
   const [openExplainModal, setOpenExplainModal] = useState(false)
 
+  const [loadQuestionsLoading, setLoadQuestionsLoading] = useState(false)
+
 
   useEffect(() => {
     fetchSession()
@@ -137,8 +139,70 @@ function InterviewPrep() {
     }
   }
 
-  const handleAddQuestionsToSession = () => {
-    toast.success('adding more questions')
+  const handleAddQuestionsToSession = async () => {
+    try {
+      setLoadQuestionsLoading(true)
+
+      // api call to generate questions
+      const aiResponse = await axiosInstance.post(API_PATHS.AI.GENERATE_QUESTION, {
+        role: session.role,
+        experience: session.experience,
+        topicsToFocus: session.topicsToFocus,
+        numberOfQuestions: 5
+      })
+
+      const questions = aiResponse.data.data.interviewQuestions
+
+      // Simulate loading for 5 seconds
+      // await new Promise(resolve => setTimeout(resolve, 3000))
+      // const questions = [
+      //   {
+      //     "_id": "6835ff3823dd3cee49ffb8fd",
+      //     "session": "6835ff3823dd3cee49ffb8f7",
+      //     "question": "What are React Hooks? Give some examples and why are they useful?",
+      //     "answer": "React Hooks are functions that let you use state and other React features in functional components. They were introduced in React 16.8. They provide a more concise way to manage state and side effects, replacing the need for class components in many cases.\n\n*   **`useState`**:  Allows you to add state to functional components.\n*   **`useEffect`**:  Allows you to perform side effects (e.g., data fetching, setting up subscriptions) in functional components.\n*   **`useContext`**:  Provides a way to access the context API.\n\n```javascript\nimport React, { useState, useEffect } from 'react';\n\nfunction MyComponent() {\n  const [count, setCount] = useState(0);\n\n  useEffect(() => {\n    document.title = `Count: ${count}`;\n  }, [count]); // Runs effect after every re-render when 'count' changes.\n\n  return (\n    <div>\n      <p>Count: {count}</p>\n      <button onClick={() => setCount(count + 1)}>Increment</button>\n    </div>\n  );\n}\n```",
+      //     "isPinned": false,
+      //     "createdAt": "2025-05-27T18:06:48.673Z",
+      //     "updatedAt": "2025-05-28T05:52:11.559Z",
+      //     "__v": 0
+      //   },
+      //   {
+      //     "_id": "6835ff3823dd3cee49ffb8fe",
+      //     "session": "6835ff3823dd3cee49ffb8f7",
+      //     "question": "Explain event handling in React. How is it different from standard HTML event handling?",
+      //     "answer": "In React, event handling is slightly different than in standard HTML.\n\n*   **Event names:** React event names are written in camelCase (e.g., `onClick`, `onChange`) instead of lowercase.\n*   **Event handlers:** You pass a function as the event handler (e.g., `onClick={handleClick}`).\n*   **Event delegation:** React uses event delegation to handle events more efficiently. Events are attached to the root of the document, and React then routes them to the appropriate components.\n\n```javascript\nfunction handleClick() {\n  alert('Button clicked!');\n}\n\nreturn <button onClick={handleClick}>Click me</button>;\n```",
+      //     "isPinned": false,
+      //     "createdAt": "2025-05-27T18:06:48.673Z",
+      //     "updatedAt": "2025-05-28T07:54:33.994Z",
+      //     "__v": 0
+      //   }
+      // ]
+
+      // api call to add questions to session
+      const response = await axiosInstance.post(API_PATHS.QUESTION.ADD_TO_SESSION, {
+        sessionId: session._id,
+        questions: questions
+      })
+
+      if (response.data.success) {
+        setSession(prev => ({
+          ...prev,
+          questions: [...prev.questions, ...questions]
+        }))
+        toast.success('Added more questions successfully')
+      }
+
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        toast.error(error.response.data.message)
+      }
+      else {
+        toast.error("Something went wrong. Try again")
+      }
+    }
+    finally {
+      setLoadQuestionsLoading(false)
+    }
   }
 
   if (loading) {
@@ -350,9 +414,17 @@ function InterviewPrep() {
               </button>
               <button
                 onClick={() => handleAddQuestionsToSession()}
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400 cursor-pointer"
+                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors border border-purple-400 cursor-pointer flex items-center gap-2"
+                disabled={loadQuestionsLoading}
               >
-                Generate more questions
+                {loadQuestionsLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Loading...
+                  </>
+                ) : (
+                  'Load more questions'
+                )}
               </button>
             </div>
           </div>
