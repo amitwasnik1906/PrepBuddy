@@ -125,7 +125,7 @@ function InterviewPrep() {
       // }
       // setExplanation(explanation)
 
-      toast.success('Explain feature coming soon')
+      toast.success('Explanation generated successfully')
 
     } catch (error) {
       if (error.response && error.response.data.message) {

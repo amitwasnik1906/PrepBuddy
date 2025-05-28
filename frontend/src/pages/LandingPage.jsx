@@ -155,7 +155,7 @@ function LandingPage() {
             <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                  50K+
+                  10K+
                 </div>
                 <div className="text-gray-600">Success Stories</div>
               </div>
