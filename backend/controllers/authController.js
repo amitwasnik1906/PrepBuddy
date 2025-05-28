@@ -2,6 +2,8 @@ const User = require("../models/userModel")
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
 const ApiResponse = require("../utils/apiResponse")
+const cloudinary = require("../utils/cloudinary")
+const fs = require("fs")
 
 // Generate jwt token
 const generateToken = (userId) => {
@@ -98,13 +100,25 @@ const getUserProfile = async (req, res) => {
     }
 }
 
-const uploadImage =  (req, res)=>{
+const uploadImage =  async (req, res)=>{
     try {
         if (!req.file) {
             return res.status(400).json({ message: "No image file uploaded" });
         }
 
-        const imageUrl = req.file.path
+        let imageUrl = req.file.path
+        
+        // Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload(imageUrl, {
+            folder: "user_profiles",
+            resource_type: "auto"
+        });
+
+        // Delete the local file after upload
+        fs.unlinkSync(imageUrl);
+
+        // Update imageUrl with Cloudinary URL
+        imageUrl = result.secure_url;
         
         res.status(200).json( new ApiResponse(200, null, {imageUrl}));
     } catch (error) {
