@@ -16,9 +16,6 @@ function App() {
           <Routes>
             <Route path='/' element={<LandingPage />} />
 
-            <Route path='/login' element={<Login />} />
-            <Route path='/signup' element={<SignUp />} />
-
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/interview-prep/:sessionId' element={<InterviewPrep />} />
           </Routes>

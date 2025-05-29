@@ -30,6 +30,10 @@ app.use("/api/ai/generate-explaination", protect, generateConceptExplanation)
 // serve upload folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads"), {}))
 
+app.get('/', (req, res) =>{
+    res.send('Server is running...')
+})
+
 // Start server
 const PORT = process.env.PORT || 5000
 app.listen(PORT, ()=>{

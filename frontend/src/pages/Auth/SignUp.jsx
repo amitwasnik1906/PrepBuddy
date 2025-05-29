@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
 import { UserContext } from '../../context/userContext'
+import { toast } from 'react-hot-toast'
 
 function SignUp({ setCurrentPage }) {
   const navigate = useNavigate()
@@ -58,8 +59,11 @@ function SignUp({ setCurrentPage }) {
 
       const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formDataToSend)
 
-      updateUser(response.data.data)
-      navigate('/dashboard')
+      // updateUser(response.data.data)
+      // navigate('/dashboard')
+      
+      toast.success("Verification email is sent. Please Verify Your Email")
+      navigate('/')
     } catch (error) {
       setError(error.response?.data?.message || 'Something went wrong. Please try again.')
     } finally {

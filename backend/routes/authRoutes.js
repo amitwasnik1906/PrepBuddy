@@ -1,5 +1,5 @@
 const express = require("express")
-const {registerUser, loginUser, getUserProfile, uploadImage} = require("../controllers/authController")
+const {registerUser, loginUser, getUserProfile, uploadImage, verifyEmail, resendEmailVerificationToken} = require("../controllers/authController")
 const {protect} = require("../middlewares/authMiddleware")
 const upload = require("../middlewares/uploadMiddleware")
 
@@ -10,5 +10,8 @@ router.post("/login", loginUser)
 router.get("/profile", protect, getUserProfile)
 
 router.post("/upload-image", upload.single("image"), uploadImage)
+
+router.get("/verify-email", verifyEmail)
+router.post("/resend-verify-token", resendEmailVerificationToken)
 
 module.exports = router

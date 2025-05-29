@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {UserContext} from "../../context/userContext"
 import axiosInstance from '../../utils/axiosInstance'
 import { API_PATHS } from '../../utils/apiPaths'
+import { toast } from 'react-hot-toast'
 
 function Login({ setCurrentPage }) {
   const navigate = useNavigate()
@@ -48,6 +49,7 @@ function Login({ setCurrentPage }) {
       }
     } catch (error) {
       if(error.response && error.response.data.message){
+        toast.error(error.response.data.message)
         setError(error.response.data.message)
       }
       else {
