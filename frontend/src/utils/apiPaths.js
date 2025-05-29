@@ -4,7 +4,9 @@ export const API_PATHS = {
     AUTH: {
         REGISTER: "/api/auth/register",
         LOGIN: "/api/auth/login",
-        GET_PROFILE: "/api/auth/profile"
+        GET_PROFILE: "/api/auth/profile",
+        VERIFY_EMAIL: "/api/auth/verify-email",
+        RESEND_VERIFY_EMAIL: "/api/auth/resend-verify-token"
     },
 
     IMAGE:{

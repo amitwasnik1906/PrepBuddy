@@ -256,7 +256,7 @@ function LandingPage() {
                 <span className="text-xl font-bold">PrepBuddy </span>
               </div>
               <p className="text-gray-400">
-                Empowering professionals to ace their interviews and land their dream jobs.
+                Empowering students and professionals to ace their interviews and land their dream jobs.
               </p>
             </div>
             <div>

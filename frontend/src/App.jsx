@@ -1,12 +1,11 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
-import Login from "./pages/Auth/Login"
-import SignUp from './pages/Auth/SignUp'
 import Dashboard from './pages/Home/Dashboard'
 import InterviewPrep from './pages/InterviewPrep/InterviewPrep'
 import { Toaster } from "react-hot-toast"
 import UserProvider from "./context/userContext"
+import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
 
 function App() {
   return (
@@ -18,6 +17,8 @@ function App() {
 
             <Route path='/dashboard' element={<Dashboard />} />
             <Route path='/interview-prep/:sessionId' element={<InterviewPrep />} />
+
+            <Route path='/verify-email' element={<VerifyEmail />} />
           </Routes>
         </Router>
 

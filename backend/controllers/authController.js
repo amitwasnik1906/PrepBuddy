@@ -24,7 +24,7 @@ const sendTokenOnMail = async (email) => {
             pass: process.env.EMAIL_PASS,
         },
     });
-    const verificationUrl = `${process.env.BACKEND_DOMAIN_URL}/api/auth/verify-email?token=${verificationToken}&email=${email}`;
+    const verificationUrl = `${process.env.EMAIL_DOMAIN_URL}/verify-email?token=${verificationToken}&email=${email}`;
     await transporter.sendMail({
         to: email,
         subject: "Verify your email",
@@ -171,7 +171,7 @@ const verifyEmail = async (req, res) => {
     try {
         const user = await User.findOne({ email, verificationToken: token });
 
-        if (!user) return res.status(400).json({ message: "Invalid token" });
+        if (!user) return res.status(400).json(new ApiResponse(200, "Invalid Token"));
 
         user.isVerified = true;
         user.verificationToken = undefined;
