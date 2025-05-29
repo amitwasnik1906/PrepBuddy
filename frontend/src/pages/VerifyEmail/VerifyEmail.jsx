@@ -18,7 +18,10 @@ function VerifyEmail() {
 
         if (!token || !email) {
           toast.error('Invalid verification link')
-          // navigate('/')
+          setEmailVerificationResponse("Invalid verification link")
+          setTimeout(() => {
+            navigate('/')
+          }, 4000)
           return
         }
 
@@ -30,18 +33,16 @@ function VerifyEmail() {
           toast.success('Email verified successfully!')
           setEmailVerificationResponse(response.data.message)
           setTimeout(() => {
-            // navigate('/')
-          }, 3000)
+            navigate('/')
+          }, 4000)
         }
-
-        console.log(verificationURL);
 
       } catch (error) {
         toast.error(error.response?.data?.message || 'Verification failed')
         setEmailVerificationResponse(error.response.data.message)
         setTimeout(() => {
-          // navigate('/')
-        }, 2000)
+          navigate('/')
+        }, 4000)
       } finally {
         setIsVerifying(false)
       }

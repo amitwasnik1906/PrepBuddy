@@ -14,35 +14,40 @@ const generateToken = (userId) => {
 
 // Send email verification token
 const sendTokenOnMail = async (email) => {
-    // Generate a verification token
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-    // Send verification email
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-    const verificationUrl = `${process.env.EMAIL_DOMAIN_URL}/verify-email?token=${verificationToken}&email=${email}`;
-    await transporter.sendMail({
-        to: email,
-        subject: "Verify your email",
-        html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #333;">Welcome to PrepBuddy!</h2>
-                <p style="color: #666; line-height: 1.6;">Thank you for registering. To complete your registration and verify your email address, please click the button below:</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${verificationUrl}" style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Verify Email Address</a>
+    try {
+        // Generate a verification token
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+        // Send verification email
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+        const verificationUrl = `${process.env.EMAIL_DOMAIN_URL}/verify-email?token=${verificationToken}&email=${email}`;
+        await transporter.sendMail({
+            to: email,
+            subject: "Verify your email",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #333;">Welcome to PrepBuddy!</h2>
+                    <p style="color: #666; line-height: 1.6;">Thank you for registering. To complete your registration and verify your email address, please click the button below:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${verificationUrl}" style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Verify Email Address</a>
+                    </div>
+                    <p style="color: #666; line-height: 1.6;">If the button above doesn't work, you can also copy and paste this link into your browser:</p>
+                    <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
+                    <p style="color: #999; font-size: 12px; margin-top: 30px;">This verification link will expire in 24 hours.</p>
                 </div>
-                <p style="color: #666; line-height: 1.6;">If the button above doesn't work, you can also copy and paste this link into your browser:</p>
-                <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
-                <p style="color: #999; font-size: 12px; margin-top: 30px;">This verification link will expire in 24 hours.</p>
-            </div>
-        `,
-    });
+            `,
+        });
 
-    return verificationToken
+        return verificationToken;
+    } catch (error) {
+        console.error("Error sending verification email:", error);
+        throw new Error("Failed to send verification email. Please try again later.");
+    }
 }
 
 const registerUser = async (req, res) => {
