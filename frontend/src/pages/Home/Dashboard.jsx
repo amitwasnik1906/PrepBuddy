@@ -91,7 +91,7 @@ function Dashboard() {
         onClose={() => {
           setOpenCreateModel(false)
         }}
-        hideHeader
+        
       >
         <CreateSessionForm />
       </Modal>

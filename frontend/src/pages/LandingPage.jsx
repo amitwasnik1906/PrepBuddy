@@ -82,16 +82,16 @@ function LandingPage() {
 
             {/* Desktop Navigation */}
             {!user ?
-              <div className="hidden md:flex items-center space-x-8">
+              <div className="items-center space-x-4 sm:space-x-8">
                 <button
                   onClick={(e)=> handleCTA("login")}
-                  className="text-purple-600 hover:text-purple-700 font-medium transition-colors cursor-pointer"
+                  className="text-purple-600 hover:text-purple-700 font-medium transition-colors cursor-pointer text-sm sm:text-base"
                 >
                   LogIn
                 </button>
                 <button
                   onClick={(e)=> handleCTA("signup")}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer text-sm sm:text-base"
                 >
                   SignUp
                 </button>
@@ -100,25 +100,10 @@ function LandingPage() {
                 <ProfileInfoCard/>
               </div>
             }
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-purple-100">
-            <div className="px-4 py-4 space-y-4">
-              link
-            </div>
-          </div>
-        )}
+        
       </nav>
 
       {/* Hero Section */}
@@ -302,6 +287,8 @@ function LandingPage() {
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
             <p>&copy; 2025 PrepBuddy . All rights reserved.</p>
           </div>
+          
+          
         </div>
       </footer>
 
@@ -312,7 +299,6 @@ function LandingPage() {
           setOpenAuthModal(false)
           setCurrentPage('login')
         }}
-        hideHeader
       >
         <div>
           {currentPage === 'login' && (<Login setCurrentPage={setCurrentPage} />)}
