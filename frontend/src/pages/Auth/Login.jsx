@@ -44,6 +44,7 @@ function Login({ setCurrentPage }) {
       const token = response.data.data.token
 
       if(token){
+        toast.success("Login Successful")
         updateUser(response.data.data)
         navigate('/dashboard')
       }
