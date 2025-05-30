@@ -42,7 +42,7 @@ function Dashboard() {
       await axiosInstance.delete(API_PATHS.SESSION.DELETE(sessionData._id))
       toast.success('Session deleted successfully')
       setOpenDeleteAlert({ open: false, data: null })
-      fetchAllSessions()      
+      fetchAllSessions()
     } catch (error) {
       toast.error('Failed to delete session')
       console.error(error)
@@ -62,18 +62,31 @@ function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sessions?.map((session) => (
-              <SummaryCard
-                key={session._id}
-                session={session}
-                onSelect={() => {
-                  navigate(`/interview-prep/${session._id}`)
-                }}
-                onDelete={() => {
-                  setOpenDeleteAlert({ open: true, data: session })
-                }}
-              />
-            ))}
+            {sessions.length === 0 ?
+              <div className="col-span-full text-center py-12 ">
+                <div className="text-gray-500 text-lg mb-4">No sessions available</div>
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => setOpenCreateModel(true)}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer text-sm sm:text-base flex items-center gap-2"
+                  >
+                    <LucidePlus className="w-5 h-5" /> Create your first session
+                  </button>
+                </div>
+              </div>
+              :
+              sessions?.map((session) => (
+                <SummaryCard
+                  key={session._id}
+                  session={session}
+                  onSelect={() => {
+                    navigate(`/interview-prep/${session._id}`)
+                  }}
+                  onDelete={() => {
+                    setOpenDeleteAlert({ open: true, data: session })
+                  }}
+                />
+              ))}
           </div>
         )}
 
@@ -91,7 +104,7 @@ function Dashboard() {
         onClose={() => {
           setOpenCreateModel(false)
         }}
-        
+
       >
         <CreateSessionForm />
       </Modal>
