@@ -54,7 +54,7 @@ function SummaryCard({session, onSelect, onDelete}) {
             e.stopPropagation()
             onDelete()
           }}
-          className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 sm:p-2 rounded-lg transition-all duration-200 z-10 relative cursor-pointer"
+          className="text-gray-500 hover:text-red-500 hover:bg-red-50 p-1.5 sm:p-2 rounded-lg transition-all duration-200 z-10 relative cursor-pointer"
         >
           <LucideTrash2 size={18} className="sm:w-[22px] sm:h-[22px]" />
         </button>
