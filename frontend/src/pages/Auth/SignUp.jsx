@@ -63,7 +63,9 @@ function SignUp({ setCurrentPage }) {
       // navigate('/dashboard')
       
       toast.success("Verification email is sent. Please Verify Your Email")
-      navigate('/')
+      setTimeout(()=>{
+        window.location.href = "/"
+      }, 3000)
     } catch (error) {
       setError(error.response?.data?.message || 'Something went wrong. Please try again.')
     } finally {

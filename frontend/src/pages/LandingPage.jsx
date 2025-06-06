@@ -66,7 +66,7 @@ function LandingPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="">
       {/* Navigation */}
       <nav className="relative z-50 bg-white/80 backdrop-blur-md border-b border-purple-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,9 +101,7 @@ function LandingPage() {
               </div>
             }
           </div>
-        </div>
-
-        
+        </div>        
       </nav>
 
       {/* Hero Section */}
@@ -192,8 +190,15 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* App preview section */}
+      <section className='bg-white/50 mb-16'>
+        <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <img src="/preview.png" alt="" className='w-full h-full object-cover '/>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20">
+      {/* <section id="testimonials" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
@@ -223,7 +228,7 @@ function LandingPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-purple-600 to-blue-600">
