@@ -30,7 +30,7 @@ function LandingPage() {
     {
       icon: <Target className="w-8 h-8" />,
       title: "Job-Specific Questions",
-      description: "Get API-powered questions and answers tailored to specific job roles"
+      description: "Get AI-powered questions and answers tailored to specific job roles"
     },
     {
       icon: <BookOpen className="w-8 h-8" />,
@@ -138,7 +138,7 @@ function LandingPage() {
             <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                  10K+
+                  100+
                 </div>
                 <div className="text-gray-600">Success Stories</div>
               </div>
@@ -237,7 +237,7 @@ function LandingPage() {
             Ready to Land Your Dream Job?
           </h2>
           <p className="text-xl text-purple-100 mb-10">
-            Join thousands of professionals who've successfully aced their interviews with our platform.
+            Take your interview preparation to the next level with our AI-powered platform designed to help you succeed.
           </p>
           <button
             onClick={(e)=> handleCTA("login")}
