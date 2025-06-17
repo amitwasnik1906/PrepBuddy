@@ -42,30 +42,29 @@ function SignUp({ setCurrentPage }) {
       let profileImageUrl = null
 
       // first upload image and get the url
-      const res = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, { image: formData.profile }, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      if (res.data.data.imageUrl) {
-        profileImageUrl = res.data.data.imageUrl
+      if (formData.profile) {
+        const res = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, { image: formData.profile }, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+        if (res.data.data.imageUrl) {
+          profileImageUrl = res.data.data.imageUrl
+        }
       }
 
       const formDataToSend = new FormData()
       formDataToSend.append('name', formData.name)
       formDataToSend.append('email', formData.email)
       formDataToSend.append('password', formData.password)
-      formDataToSend.append('profileImageUrl', profileImageUrl || "" )
+      formDataToSend.append('profileImageUrl', profileImageUrl || "")
 
       const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, formDataToSend)
 
-      // updateUser(response.data.data)
-      // navigate('/dashboard')
-      
       toast.success("Verification email is sent. Please Verify Your Email")
-      setTimeout(()=>{
-        window.location.href = "/"
-      }, 3000)
+      await new Promise(resolve => setTimeout(resolve, 6000));
+      window.location.href = "/"
+
     } catch (error) {
       setError(error.response?.data?.message || 'Something went wrong. Please try again.')
     } finally {
@@ -161,20 +160,20 @@ function SignUp({ setCurrentPage }) {
             {loading ? 'Signing up...' : 'Sign up'}
           </button>
         </div>
-
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{' '}
-            <button
-              type="button"
-              onClick={() => setCurrentPage('login')}
-              className="font-medium text-purple-600 hover:text-purple-500"
-            >
-              Sign in
-            </button>
-          </p>
-        </div>
       </form>
+
+      <div className="text-center mt-6">
+        <p className="text-sm text-gray-600">
+          Already have an account?{' '}
+          <button
+            type="button"
+            onClick={() => setCurrentPage('login')}
+            className="font-medium text-purple-600 hover:text-purple-500 cursor-pointer"
+          >
+            Sign in
+          </button>
+        </p>
+      </div>
     </div>
   )
 }

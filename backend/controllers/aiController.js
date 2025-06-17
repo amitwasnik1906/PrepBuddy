@@ -25,10 +25,10 @@ const generateInterviewQuestions = async (req, res) => {
         const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
         const data = JSON.parse(cleanedText);
 
-        res.status(200).json(new ApiResponse(200, "Interview questions generated successfully", { interviewQuestions: data }))
+        return res.status(200).json(new ApiResponse(200, "Interview questions generated successfully", { interviewQuestions: data }))
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, "Failed to generate interview questions", { error: error.message }))
+        return res.status(500).json(new ApiResponse(500, "Failed to generate interview questions", { error: error.message }))
     }
 }
 
@@ -52,9 +52,9 @@ const generateConceptExplanation = async (req, res) => {
         const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
         const data = JSON.parse(cleanedText);
 
-        res.status(200).json(new ApiResponse(200, "Concept explanation generated successfully", { explanation: data }))
+        return res.status(200).json(new ApiResponse(200, "Concept explanation generated successfully", { explanation: data }))
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, "Failed to generate concept explanation", { error: error.message }))
+        return res.status(500).json(new ApiResponse(500, "Failed to generate concept explanation", { error: error.message }))
     }
 }
 

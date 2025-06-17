@@ -30,9 +30,9 @@ const createSession = async (req, res)=>{
         session.questions = questionDocs
         await session.save()
     
-        res.status(201).json(new ApiResponse(201, "Session created successfully", {session}))
+        return res.status(201).json(new ApiResponse(201, "Session created successfully", {session}))
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -44,12 +44,12 @@ const getMySessions = async (req, res)=>{
             .populate('questions')
             .sort({ createdAt: -1 })
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200, "Sessions retrieved successfully", {sessions})
         )
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -73,12 +73,12 @@ const getSessionById = async (req, res)=>{
             )
         }
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200, "Session retrieved successfully", {session})
         )
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -105,12 +105,12 @@ const deleteSession = async (req, res)=>{
 
         await Session.findByIdAndDelete(id)
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200, "Session deleted successfully")
         )
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 

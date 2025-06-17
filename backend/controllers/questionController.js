@@ -33,10 +33,10 @@ const addQuestionsToSession = async (req, res) => {
         session.questions.push(...createdQuestions.map(q => q._id))
         await session.save()
 
-        res.status(200).json(new ApiResponse(200, "Questions added successfully", { createdQuestions }))
+        return res.status(200).json(new ApiResponse(200, "Questions added successfully", { createdQuestions }))
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -59,9 +59,9 @@ const togglePinQuestion = async (req, res) => {
         question.isPinned = !question.isPinned
         await question.save()
 
-        res.status(200).json(new ApiResponse(200, "Question pin status updated successfully", question))
+        return res.status(200).json(new ApiResponse(200, "Question pin status updated successfully", question))
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -85,9 +85,9 @@ const updateQuestionNote = async (req, res) => {
         question.note = note || ""
         await question.save()
 
-        res.status(200).json(new ApiResponse(200, "Question note updated successfully", question))
+        return res.status(200).json(new ApiResponse(200, "Question note updated successfully", question))
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 

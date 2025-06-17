@@ -17,7 +17,6 @@ function VerifyEmail() {
         const email = searchParams.get('email')
 
         if (!token || !email) {
-          toast.error('Invalid verification link')
           setEmailVerificationResponse("Invalid verification link")
           setTimeout(() => {
             navigate('/')

@@ -9,7 +9,7 @@ const nodemailer = require("nodemailer");
 
 // Generate jwt token
 const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '2d' })
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '10d' })
 }
 
 // Send email verification token
@@ -57,7 +57,7 @@ const registerUser = async (req, res) => {
         // check if user is already exits
         const userExists = await User.findOne({ email })
         if (userExists) {
-            res.status(401).json(new ApiResponse(401, "User with this email is already exits"))
+            return res.status(401).json(new ApiResponse(401, "User with this email is already exits"))
         }
 
         // make password hash
@@ -72,7 +72,7 @@ const registerUser = async (req, res) => {
             name, email, password: hashedPassword, profileImageUrl, verificationToken: verificationToken
         })
 
-        res.status(201).json(
+        return res.status(201).json(
             new ApiResponse(200, "User registered successfully, Check Email to verify", {
                 _id: user._id,
                 name: user.name,
@@ -82,7 +82,7 @@ const registerUser = async (req, res) => {
         )
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, "Error in register controller", error))
     }
 }
 
@@ -110,7 +110,7 @@ const loginUser = async (req, res) => {
         // Generate JWT token
         const token = generateToken(user._id)
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200, "Login successful", {
                 _id: user._id,
                 name: user.name,
@@ -121,7 +121,7 @@ const loginUser = async (req, res) => {
         )
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -134,12 +134,12 @@ const getUserProfile = async (req, res) => {
             return res.status(404).json(new ApiResponse(404, "User not found"))
         }
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200, "User profile retrieved successfully", user)
         )
 
     } catch (error) {
-        res.status(500).json(new ApiResponse(500, error.message))
+        return res.status(500).json(new ApiResponse(500, error.message))
     }
 }
 
@@ -163,10 +163,10 @@ const uploadImage = async (req, res) => {
         // Update imageUrl with Cloudinary URL
         imageUrl = result.secure_url;
 
-        res.status(200).json(new ApiResponse(200, null, { imageUrl }));
+        return res.status(200).json(new ApiResponse(200, null, { imageUrl }));
     } catch (error) {
         console.error("Error uploading image:", error);
-        res.status(500).json(new ApiResponse(500, error.message));
+        return res.status(500).json(new ApiResponse(500, error.message));
     }
 }
 
@@ -182,10 +182,10 @@ const verifyEmail = async (req, res) => {
         user.verificationToken = undefined;
         await user.save();
 
-        res.status(200).json(new ApiResponse(200, "Email verified successfully!"));
+        return res.status(200).json(new ApiResponse(200, "Email verified successfully!"));
     } catch (error) {
         console.error(error);
-        res.status(500).json(new ApiResponse(500, "Verification failed"));
+        return res.status(500).json(new ApiResponse(500, "Verification failed"));
     }
 };
 
@@ -211,10 +211,10 @@ const resendEmailVerificationToken = async (req, res) => {
         user.verificationToken = verificationToken
         await user.save()
 
-        res.status(201).json(new ApiResponse(201, "Verification Mail is sent on your email"))
+        return res.status(201).json(new ApiResponse(201, "Verification Mail is sent on your email"))
     } catch (error) {
         console.error("Error Sending Email Verification Token:", error);
-        res.status(500).json(new ApiResponse(500, error.message));
+        return res.status(500).json(new ApiResponse(500, error.message));
     }
 }
 
