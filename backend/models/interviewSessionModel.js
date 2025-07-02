@@ -6,8 +6,8 @@ const interviewSessionSchema = new mongoose.Schema(
         role: {type: String, required: true},
         experience: {type: String, required: true},
         topicsToFocus: {type: String, required: true},
+        description: String,
         resumeData: {type: String, default: ""},
-        questions: [{type: mongoose.Schema.Types.ObjectId, ref: "Question"}]
     },
     {
         timestamps: true
