@@ -58,4 +58,70 @@ const generateConceptExplanation = async (req, res) => {
     }
 }
 
-module.exports = { generateInterviewQuestions, generateConceptExplanation }
+const generateFirstInterviewQuestion = async (prompt)=>{
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            contents: prompt
+        })
+
+        let rawText = response.candidates[0].content.parts[0].text
+
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
+        return data
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+const generateNextInterviewQuestion = async(prompt, history)=>{
+    try {
+        if (!prompt || !history) {
+            console.log("Prompt and History is required");
+            return null
+        }
+
+        console.log(prompt);
+        
+
+        let chatHistoryForGemini = [];
+        chatHistoryForGemini.push({
+            role: "user",
+            parts: [{ text: prompt }]
+        });
+        history.forEach((item) => {
+            chatHistoryForGemini.push({
+                role: item.role,
+                parts: item.parts
+            });
+        })
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            contents: chatHistoryForGemini
+        })
+
+        console.log("response", response);
+        
+        let rawText = response.candidates[0].content.parts[0].text
+
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
+        return data
+
+    } catch (error) {
+        return null
+    }
+}
+
+const generateFeedback = async (req, res)=>{
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+module.exports = { generateInterviewQuestions, generateConceptExplanation, generateFirstInterviewQuestion, generateNextInterviewQuestion }

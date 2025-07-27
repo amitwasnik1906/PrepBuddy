@@ -12,6 +12,7 @@ connectDB()
 
 // Middlewares
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 const authRoutes = require("./routes/authRoutes")
@@ -26,6 +27,9 @@ app.use("/api/question", questionRoutes)
 
 app.use("/api/ai/generate-questions", protect, generateInterviewQuestions)
 app.use("/api/ai/generate-explaination", protect, generateConceptExplanation)
+
+const interviewRoutes = require("./routes/interviewRoutes")
+app.use("/api/interview", interviewRoutes)
 
 // serve upload folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads"), {}))

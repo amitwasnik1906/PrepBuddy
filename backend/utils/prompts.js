@@ -39,4 +39,64 @@ const conceptExplanationPrompt = (question) => (`
     Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
 `)
 
-module.exports = {interviewQuestionsPrompt, conceptExplanationPrompt}
+const firstInterviewQuestionPrompt = (jobRole, experience, interviewType, topicsToFocus, resumeData) => (`
+    You are an AI Interviewer. Your task is to generate the initial, relevant interview question based on the provided context.
+
+    **Interview Context:**
+    - Job Role: ${jobRole}
+    - Experience Level: ${experience} years
+    - Interview Type: ${interviewType}
+    - Key Topics to Focus On: ${topicsToFocus}
+    {If resumeData is provided, add this line: - Candidate's Resume Data: ${resumeData}}
+
+    **Instructions:**
+    1.  Generate only ONE interview question.
+    2.  Phrase the question in a natural, conversational tone, as if a human interviewer were speaking.
+    3.  The question must be concise and directly relevant to the job role, experience level, and interview type.
+    4.  Return the result as a valid JSON object in the following format:
+        {
+            "title": "Short title here?",
+            "question": "question here"
+        }
+
+    Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
+`)
+
+const nextInterviewQuestionPrompt = () => (`
+    You are an AI Interviewer. Your task is to generate the next relevant interview question.
+
+    **Instructions:**
+    1.  Generate only ONE interview question.
+    2.  Phrase the question in a natural, conversational tone, as if a human interviewer were speaking.
+    3.  Review the entire chat history provided, paying particular attention to the candidate's last response. Ensure the new question builds upon the conversation, avoids repetition, and probes deeper into the candidate's previous answer or related topics where appropriate, maintaining a natural flow.
+    4.  Do NOT provide any answers, feedback, or conversational filler beyond the question itself.
+    5.  Return the result as a valid JSON object in the following format:
+        {
+            "title": "Short title here?",
+            "question": "question here"
+        }
+       
+    Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
+`)
+
+const interviewFeedbackPrompt = (jobRole, experience, interviewType, topicsToFocus) => (`
+    You are an AI Interviewer. The interview for the **${jobRole}** role, with **${experience} years of experience**, focusing on **${topicsToFocus}** and of **${interviewType}** type, has concluded.
+
+    **Interview Transcript:**
+    {Insert the entire formatted interviewHistory here, e.g., by mapping it to "Q: ... A: ..." pairs}
+
+    **Instructions for Feedback:**
+    1.  Provide concise and constructive overall feedback on the candidate's performance.
+    2.  Highlight key strengths demonstrated during the interview.
+    3.  Identify specific areas for improvement, offering actionable advice.
+    4.  Consider the job role, experience level, interview type, and topics discussed.
+    5.  Maintain a professional, encouraging, and helpful tone.
+    6.  Return the result as a valid JSON object in the following format:
+        {
+            "feedback": "Your comprehensive feedback here."
+        }
+
+    Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
+`)
+
+module.exports = { interviewQuestionsPrompt, conceptExplanationPrompt,firstInterviewQuestionPrompt, nextInterviewQuestionPrompt, interviewFeedbackPrompt };
