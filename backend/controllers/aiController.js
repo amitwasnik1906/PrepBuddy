@@ -79,13 +79,10 @@ const generateFirstInterviewQuestion = async (prompt)=>{
 const generateNextInterviewQuestion = async(prompt, history)=>{
     try {
         if (!prompt || !history) {
-            console.log("Prompt and History is required");
+            console.log("Prompt and History are required");
             return null
         }
-
-        console.log(prompt);
         
-
         let chatHistoryForGemini = [];
         chatHistoryForGemini.push({
             role: "user",
@@ -102,8 +99,6 @@ const generateNextInterviewQuestion = async(prompt, history)=>{
             model: "gemini-2.0-flash-lite",
             contents: chatHistoryForGemini
         })
-
-        console.log("response", response);
         
         let rawText = response.candidates[0].content.parts[0].text
 
@@ -112,16 +107,33 @@ const generateNextInterviewQuestion = async(prompt, history)=>{
         return data
 
     } catch (error) {
+        console.log(error);
         return null
     }
 }
 
-const generateFeedback = async (req, res)=>{
+const generateInterviewFeedback = async (prompt)=>{
     try {
+        if (!prompt) {
+            console.log("Prompt is required");
+            return null
+        }
         
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            contents: prompt
+        })
+
+        let rawText = response.candidates[0].content.parts[0].text
+
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
+
+        return data
     } catch (error) {
-        
+        console.log(error);
+        return null
     }
 }
 
-module.exports = { generateInterviewQuestions, generateConceptExplanation, generateFirstInterviewQuestion, generateNextInterviewQuestion }
+module.exports = { generateInterviewQuestions, generateConceptExplanation, generateFirstInterviewQuestion, generateNextInterviewQuestion, generateInterviewFeedback }

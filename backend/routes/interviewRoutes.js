@@ -11,7 +11,7 @@ router.get("/:id", protect, getInterviewById)
 
 router.post("/answer/:id", protect, submitAnswer)
 
-router.post("/feedback/create", protect, generateFeedback)
+router.post("/feedback/:id", protect, generateFeedback)
 router.get("/feedback/:id", protect, getFeedback)
 
 module.exports = router

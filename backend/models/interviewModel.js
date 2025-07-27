@@ -79,7 +79,9 @@ const interviewSchema = new mongoose.Schema(
             required: true
         },
 
-        feedback: String, // The comprehensive feedback from the AI, optional initially
+        feedback: {
+            type: mongoose.Schema.Types.Mixed
+        }
 
     },
     {

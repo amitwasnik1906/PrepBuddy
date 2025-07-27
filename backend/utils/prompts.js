@@ -79,11 +79,11 @@ const nextInterviewQuestionPrompt = () => (`
     Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
 `)
 
-const interviewFeedbackPrompt = (jobRole, experience, interviewType, topicsToFocus) => (`
+const interviewFeedbackPrompt = (jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript) => (`
     You are an AI Interviewer. The interview for the **${jobRole}** role, with **${experience} years of experience**, focusing on **${topicsToFocus}** and of **${interviewType}** type, has concluded.
 
     **Interview Transcript:**
-    {Insert the entire formatted interviewHistory here, e.g., by mapping it to "Q: ... A: ..." pairs}
+    ${formattedInterviewTranscript}
 
     **Instructions for Feedback:**
     1.  Provide concise and constructive overall feedback on the candidate's performance.
@@ -93,7 +93,10 @@ const interviewFeedbackPrompt = (jobRole, experience, interviewType, topicsToFoc
     5.  Maintain a professional, encouraging, and helpful tone.
     6.  Return the result as a valid JSON object in the following format:
         {
-            "feedback": "Your comprehensive feedback here."
+            "feedback": "Your comprehensive feedback here.",
+            "strengths": ["List of key strengths demonstrated"],
+            "areasForImprovement": ["List of specific areas for improvement"],
+            "actionableAdvice" : ["List of Actionable Advice"]
         }
 
     Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
