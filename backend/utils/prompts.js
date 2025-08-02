@@ -47,7 +47,6 @@ const firstInterviewQuestionPrompt = (jobRole, experience, interviewType, topics
     - Experience Level: ${experience} years
     - Interview Type: ${interviewType}
     - Key Topics to Focus On: ${topicsToFocus}
-    {If resumeData is provided, add this line: - Candidate's Resume Data: ${resumeData}}
 
     **Instructions:**
     1.  Generate only ONE interview question.
