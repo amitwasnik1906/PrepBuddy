@@ -39,7 +39,7 @@ const conceptExplanationPrompt = (question) => (`
     Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
 `)
 
-const firstInterviewQuestionPrompt = (jobRole, experience, interviewType, topicsToFocus, resumeData) => (`
+const firstInterviewQuestionPrompt = ({jobRole, experience, interviewType, topicsToFocus, resumeData}) => (`
     You are an AI Interviewer. Your task is to generate the initial, relevant interview question based on the provided context.
 
     **Interview Context:**
@@ -78,7 +78,7 @@ const nextInterviewQuestionPrompt = () => (`
     Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
 `)
 
-const interviewFeedbackPrompt = (jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript) => (`
+const interviewFeedbackPrompt = ({jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript}) => (`
     You are an AI Interviewer. The interview for the **${jobRole}** role, with **${experience} years of experience**, focusing on **${topicsToFocus}** and of **${interviewType}** type, has concluded.
 
     **Interview Transcript:**

@@ -44,7 +44,7 @@ const createInterview = async (req, res) => {
         })
 
         // generate first question
-        const prompt = firstInterviewQuestionPrompt(jobRole, experience, topicsToFocus, interviewType, resumeData)
+        const prompt = firstInterviewQuestionPrompt({jobRole, experience, topicsToFocus, interviewType, resumeData})
 
         const { question } = await generateFirstInterviewQuestion(prompt)
         // const { question } = {
@@ -195,7 +195,7 @@ const generateFeedback = async (req, res) => {
 
         const formattedInterviewTranscript = formatInterviewHistoryToTranscript(interviewHistory)
 
-        const prompt = interviewFeedbackPrompt(jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript)
+        const prompt = interviewFeedbackPrompt({jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript})
         const interviewFeedback = await generateInterviewFeedback(prompt);
         // const interviewFeedback = {
         //     "feedback": "The candidate presented a strong understanding of microservices and event-driven architectures, which is highly relevant for a Backend Software Engineer with 3-5 years of experience. Their ability to articulate solutions for data consistency challenges in a distributed system, using concepts like idempotency and dead-letter queues, showcased significant technical depth. The discussion around Kafka, Docker, and Consul further reinforced their hands-on experience with modern backend technologies. While strong on architectural concepts, there's an opportunity to link these high-level discussions more directly to their specific experience with Node.js, Express.js, and MongoDB.",
