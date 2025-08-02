@@ -24,9 +24,9 @@ function App() {
 
           <Route path='/verify-email' element={<VerifyEmail />} />
 
-          <Route path='/interview/dashboard' element={<MockInterviewDashboard/>} />
-          <Route path='/interview/:interviewId' element={<PastInterviewDetails/>} />
-          <Route path='/interview/mock/:interviewId' element={<Interview/>} />
+          {user && <Route path='/interview/dashboard' element={<MockInterviewDashboard />} />}
+          {user && <Route path='/interview/:interviewId' element={<PastInterviewDetails />} />}
+          {user && <Route path='/interview/mock/:interviewId' element={<Interview />} />}
         </Routes>
       </Router>
 
