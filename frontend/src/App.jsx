@@ -6,6 +6,9 @@ import InterviewPrep from './pages/InterviewPrep/InterviewPrep'
 import { Toaster } from "react-hot-toast"
 import { UserContext } from "./context/userContext"
 import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
+import MockInterviewDashboard from './pages/MockInterview/MockInterviewDashboard'
+import PastInterviewDetails from './pages/MockInterview/PastInterviewDetails'
+import Interview from './pages/MockInterview/Interview'
 
 function App() {
   const { user } = useContext(UserContext)
@@ -20,6 +23,10 @@ function App() {
           {user && <Route path='/interview-prep/:sessionId' element={<InterviewPrep />} />}
 
           <Route path='/verify-email' element={<VerifyEmail />} />
+
+          <Route path='/interview/dashboard' element={<MockInterviewDashboard/>} />
+          <Route path='/interview/:interviewId' element={<PastInterviewDetails/>} />
+          <Route path='/interview/mock/:interviewId' element={<Interview/>} />
         </Routes>
       </Router>
 
