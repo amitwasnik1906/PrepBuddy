@@ -142,6 +142,8 @@ const submitAnswer = async (req, res) => {
 
         // if total questions hit
         if ((interview.totalQuestions * 2) < interview.interviewHistory.length) {
+            interview.status = "completed"
+            interview.endTime = Date.now()
             await interview.save();
             const nextQuestion = "END"
             return res.status(200).json(new ApiResponse(200, "Answer submitted successfully & interview completed", { nextQuestion }));
