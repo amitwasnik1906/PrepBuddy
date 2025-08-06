@@ -44,17 +44,18 @@ const createInterview = async (req, res) => {
         })
 
         // generate first question
-        const prompt = firstInterviewQuestionPrompt({jobRole, experience, topicsToFocus, interviewType, resumeData})
+        const prompt = firstInterviewQuestionPrompt({ jobRole, experience, topicsToFocus, interviewType, resumeData })
 
-        const { question } = await generateFirstInterviewQuestion(prompt)
+        const result = await generateFirstInterviewQuestion(prompt)
+        if (!result) {
+            return res.status(500).json(new ApiResponse(500, "Failed to generate first interview question"));
+        }
+        const { question } = result
+
         // const { question } = {
         //     title: 'Node.js and Microservices',
         //     question: "Given your experience with Node.js and backend development, can you describe a challenging microservices project you've worked on, and what architectural decisions you made?"
         // }
-
-        if (!question) {
-            return res.status(400).json(new ApiResponse(500, "Failed to generate first interview questions"))
-        }
 
         // store prompt and question from api in database
         interview.interviewHistory = [
@@ -151,12 +152,15 @@ const submitAnswer = async (req, res) => {
         const interviewHistory = interview.interviewHistory // array
 
         const result = await generateNextInterviewQuestion(prompt, interviewHistory);
-
         if (!result) {
             return res.status(500).json(new ApiResponse(500, "Failed to generate next question"));
         }
-
         const { question } = result
+
+        // const { question } = {
+        //     title: 'Node.js and Microservices',
+        //     question: "That's a great tech stack. Could you elaborate on how you specifically implemented the event-driven architecture to ensure data consistency within your inventory system, and what strategies you used to handle potential issues like message failures or out-of-order events?"
+        // }
 
         interview.interviewHistory.push(
             {
@@ -195,8 +199,12 @@ const generateFeedback = async (req, res) => {
 
         const formattedInterviewTranscript = formatInterviewHistoryToTranscript(interviewHistory)
 
-        const prompt = interviewFeedbackPrompt({jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript})
+        const prompt = interviewFeedbackPrompt({ jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript })
         const interviewFeedback = await generateInterviewFeedback(prompt);
+        if (!interviewFeedback) {
+            return res.status(500).json(new ApiResponse(500, "Failed to interview Feedback"));
+        }
+
         // const interviewFeedback = {
         //     "feedback": "The candidate presented a strong understanding of microservices and event-driven architectures, which is highly relevant for a Backend Software Engineer with 3-5 years of experience. Their ability to articulate solutions for data consistency challenges in a distributed system, using concepts like idempotency and dead-letter queues, showcased significant technical depth. The discussion around Kafka, Docker, and Consul further reinforced their hands-on experience with modern backend technologies. While strong on architectural concepts, there's an opportunity to link these high-level discussions more directly to their specific experience with Node.js, Express.js, and MongoDB.",
         //     "strengths": [
