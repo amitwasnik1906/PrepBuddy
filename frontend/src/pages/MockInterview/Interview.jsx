@@ -72,6 +72,10 @@ const AIMockInterview = () => {
     };
   }, []);
 
+  useEffect(()=>{
+    console.log(agentState);
+  }, [agentState])
+
   useEffect(() => {
     async function getInterviewDetails() {
       try {
@@ -150,11 +154,15 @@ const AIMockInterview = () => {
 
       // if interview Ended
       if (nextQuestion === "END") {
-        speakQuestion("Alright, that brings us to the end of our interview today. Thank you for your time. Please review the feedback provided");
-        setInterviewEnded(true)
         setCurrentQuestion("");
         setUserResponse("")
-        setIsProcessing(false)
+
+        speakQuestion("Alright, that brings us to the end of our interview today. Thank you for your time. Please review the feedback provided");
+
+        await new Promise(resolve => setTimeout(resolve, 15000));
+
+        setInterviewEnded(true)
+        
         return
       }
 
