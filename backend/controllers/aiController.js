@@ -58,7 +58,7 @@ const generateConceptExplanation = async (req, res) => {
     }
 }
 
-const generateFirstInterviewQuestion = async (prompt)=>{
+const generateFirstInterviewQuestion = async (prompt) => {
     try {
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash-lite",
@@ -76,18 +76,15 @@ const generateFirstInterviewQuestion = async (prompt)=>{
     }
 }
 
-const generateNextInterviewQuestion = async(prompt, history)=>{
+const generateNextInterviewQuestion = async (prompt, history) => {
     try {
         if (!prompt || !history) {
             console.log("Prompt and History are required");
             return null
         }
-        
+
         let chatHistoryForGemini = [];
-        chatHistoryForGemini.push({
-            role: "user",
-            parts: [{ text: prompt }]
-        });
+
         history.forEach((item) => {
             chatHistoryForGemini.push({
                 role: item.role,
@@ -95,12 +92,19 @@ const generateNextInterviewQuestion = async(prompt, history)=>{
             });
         })
 
+        chatHistoryForGemini.push({
+            role: "user",
+            parts: [{ text: prompt }]
+        });
+
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash-lite",
             contents: chatHistoryForGemini
         })
-        
+
         let rawText = response.candidates[0].content.parts[0].text
+
+        console.log(rawText);
 
         const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
         const data = JSON.parse(cleanedText);
@@ -112,13 +116,13 @@ const generateNextInterviewQuestion = async(prompt, history)=>{
     }
 }
 
-const generateInterviewFeedback = async (prompt)=>{
+const generateInterviewFeedback = async (prompt) => {
     try {
         if (!prompt) {
             console.log("Prompt is required");
             return null
         }
-        
+
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash-lite",
             contents: prompt
