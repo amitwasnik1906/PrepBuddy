@@ -56,8 +56,6 @@ function CreateInterviewForm() {
       // Make API request
       const res = await axiosInstance.post(API_PATHS.INTERVIEW.CREATE, payload)
 
-      console.log(res.data);
-
       if (res.data && res.data.success) {
         toast.success('Interview created successfully!')
         // Optionally, close modal or navigate to the new interview

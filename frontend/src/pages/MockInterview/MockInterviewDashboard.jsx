@@ -26,7 +26,7 @@ function MockInterviewDashboard() {
     try {
       // api request to delete
 
-      
+
       toast.success('interview deleted successfully')
       setOpenDeleteAlert({ open: false, data: null })
       fetchAllSessions()
@@ -41,8 +41,6 @@ function MockInterviewDashboard() {
       // api request to fetch all interviews
       setLoading(true);
       const res = await axiosInstance.get(API_PATHS.INTERVIEW.GET_ALL);
-      console.log(res.data);
-
       setInterviews(res.data?.data.interviews || []);
 
     } catch (error) {
@@ -84,7 +82,7 @@ function MockInterviewDashboard() {
                   key={interview._id}
                   interview={interview}
                   onSelect={() => {
-                    navigate(`/interview/${interview._id}`)                   
+                    navigate(`/interview/${interview._id}`)
                   }}
                   onDelete={() => {
                     setOpenDeleteAlert({ open: true, data: interview })

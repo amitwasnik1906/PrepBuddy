@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Play, Pause, RotateCcw, Send } from 'lucide-react';
+import { Mic, MicOff, Play, Pause, RotateCcw, Send, MessageCircle, User, Bot, Volume2 } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
+import toast from 'react-hot-toast';
 
 const AIMockInterview = () => {
   const [isListening, setIsListening] = useState(false);
@@ -42,8 +43,6 @@ const AIMockInterview = () => {
 
       recognitionRef.current.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        console.log(userResponse);
-        console.log(transcript);
 
         setUserResponse(prev => (prev + " " + transcript));
       };
@@ -72,20 +71,16 @@ const AIMockInterview = () => {
     };
   }, []);
 
-  useEffect(()=>{
-    console.log(agentState);
-  }, [agentState])
-
   useEffect(() => {
     async function getInterviewDetails() {
       try {
         const response = await axiosInstance.get(API_PATHS.INTERVIEW.GET_ONE(interviewId))
         setInterviewDetails(response.data.data.interview)
-        console.log(response.data.data.interview);
-
+        if (response.data.data.interview.status === 'completed') {
+          setInterviewEnded(true)
+        }
       } catch (error) {
-        console.log(error);
-
+        toast.error(error.message)
       }
     }
 
@@ -121,6 +116,7 @@ const AIMockInterview = () => {
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
+      setAgentState('idle');
     }
   };
 
@@ -162,7 +158,7 @@ const AIMockInterview = () => {
         await new Promise(resolve => setTimeout(resolve, 15000));
 
         setInterviewEnded(true)
-        
+
         return
       }
 
@@ -180,171 +176,286 @@ const AIMockInterview = () => {
   const getAgentAnimation = () => {
     switch (agentState) {
       case 'speaking':
-        return 'animate-pulse bg-blue-500';
+        return 'animate-pulse bg-gradient-to-r from-blue-500 to-purple-600 shadow-2xl shadow-blue-500/50';
       case 'listening':
-        return 'animate-bounce bg-green-500';
+        return 'animate-bounce bg-gradient-to-r from-green-500 to-emerald-600 shadow-2xl shadow-green-500/50';
       case 'thinking':
-        return 'animate-spin bg-yellow-500';
+        return 'animate-spin bg-gradient-to-r from-amber-500 to-orange-600 shadow-2xl shadow-amber-500/50';
       default:
-        return 'bg-gray-400';
+        return 'bg-gradient-to-r from-gray-400 to-gray-500 shadow-xl';
     }
   };
 
   const getAgentExpression = () => {
     switch (agentState) {
       case 'speaking':
-        return '😊';
+        return '🗣️';
       case 'listening':
         return '👂';
       case 'thinking':
         return '🤔';
       default:
-        return '😐';
+        return '🤖';
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (agentState) {
+      case 'speaking':
+        return 'bg-blue-500 shadow-lg shadow-blue-500/50';
+      case 'listening':
+        return 'bg-green-500 animate-bounce shadow-lg shadow-green-500/50';
+      case 'thinking':
+        return 'bg-amber-500 animate-spin shadow-lg shadow-amber-500/50';
+      default:
+        return 'bg-gray-400';
     }
   };
 
   // If interview has ended, show a page with a button to go to feedback page
   if (interviewEnded) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-lg w-full flex flex-col items-center">
-          <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold mb-2 text-center">Interview Completed!</h2>
-          <p className="text-gray-700 mb-6 text-center">
-            Thank you for participating in the mock interview.<br />
-            You can now view your feedback.
-          </p>
-          <button
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors duration-200"
-            onClick={() => {
-              navigate(`/interview/:${interviewId}`)
-            }}
-          >
-            View Feedback
-          </button>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-100 p-12 max-w-2xl w-full">
+          <div className="text-center">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-2xl">
+              <span className="text-4xl">🎉</span>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+              Interview Completed!
+            </h1>
+            <p className="text-gray-600 text-lg mb-8 leading-relaxed">
+              Congratulations on completing your mock interview session.<br />
+              Your performance has been analyzed and feedback is ready for review.
+            </p>
+            <button
+              className="group bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white font-semibold px-10 py-4 rounded-2xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg"
+              onClick={() => {
+                navigate(`/interview/${interviewId}`)
+              }}
+            >
+              <span className="flex items-center gap-3">
+                <MessageCircle className="w-5 h-5" />
+                View Detailed Feedback
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="container mx-auto px-12 py-4  flex flex-col">
+
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
-          <h1 className="text-3xl font-bold text-center">AI Mock Interview</h1>
-          <p className="text-center mt-2 text-indigo-100">Practice your interview skills with Alex</p>
+        <div className=" border-gray-100 p-4 mb-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+              AI Mock Interview
+            </h1>
+            <p className="text-gray-600 text-lg">Practice your interview skills with our AI interviewer</p>
+            {interviewStarted && (
+              <div className="fixed top-8 right-8 z-30 mt-0 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl border border-blue-200 shadow-lg">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-blue-800">Question {questionCount}</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Main Content */}
-        <div className="p-8">
-          {/* AI Agent */}
-          <div className="flex flex-col items-center mb-8">
-            <div className={`w-32 h-32 rounded-full ${getAgentAnimation()} flex items-center justify-center mb-4 transition-all duration-300`}>
-              <div className="text-6xl">{getAgentExpression()}</div>
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-2">Alex - AI Interviewer</h2>
-            <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${agentState === 'idle' ? 'bg-gray-400' : agentState === 'speaking' ? 'bg-blue-500 animate-pulse' : agentState === 'listening' ? 'bg-green-500 animate-bounce' : 'bg-yellow-500 animate-spin'}`}></div>
-              <span className="text-sm text-gray-600 capitalize">{agentState === 'idle' ? 'Ready' : agentState}</span>
+        {/* Main Content - Flex grow to fill remaining space */}
+        <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-8 mb-20">
+
+          {/* Left Column - AI Agent */}
+          <div className="xl:col-span-1">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 h-full flex flex-col items-center justify-center">
+              <div className="text-center mb-8">
+                <div className={`w-40 h-40 rounded-full ${getAgentAnimation()} flex items-center justify-center mb-6 transition-all duration-500`}>
+                  <div className="text-8xl">{getAgentExpression()}</div>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">Alex</h2>
+                <p className="text-gray-600 text-lg mb-4">AI Interviewer</p>
+                <div className="flex items-center justify-center gap-3">
+                  <div className={`w-4 h-4 rounded-full ${getStatusColor()}`}></div>
+                  <span className="text-lg font-medium text-gray-700 capitalize">
+                    {agentState === 'idle' ? 'Ready to help' : agentState}
+                  </span>
+                </div>
+              </div>
+
+              {/* Agent Status Card */}
+              <div className="w-full p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
+                <h3 className="font-semibold text-gray-800 mb-3 text-center">Current Status</h3>
+                <div className="text-center">
+                  {agentState === 'idle' && <p className="text-gray-600">Waiting for your input</p>}
+                  {agentState === 'speaking' && <p className="text-blue-600 font-medium">🎵 Speaking question aloud</p>}
+                  {agentState === 'listening' && <p className="text-green-600 font-medium">🎤 Listening to your response</p>}
+                  {agentState === 'thinking' && <p className="text-amber-600 font-medium">⚡ Processing your answer</p>}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Question Display */}
-          {interviewStarted && (
-            <div className="bg-gray-50 rounded-2xl p-6 mb-8">
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-semibold">Q</span>
-                </div>
-                <div className="flex-1">
-                  {
-                    agentState === 'thinking' ? <div className="text-gray-600 text-lg">Thinking...</div> :
-                      <p className="text-gray-800 leading-relaxed text-lg">{currentQuestion}</p>
-                  }
+          {/* Right Column - Interview Content */}
+          <div className="xl:col-span-2 flex flex-col gap-8">
+
+            {/* Question Display */}
+            {interviewStarted && (
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <Bot className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-4">
+                      <h3 className="text-xl font-bold text-gray-800">Interview Question</h3>
+                      <button
+                        onClick={() => speakQuestion(currentQuestion)}
+                        disabled={isProcessing || agentState === 'speaking' || agentState === 'thinking'}
+                        className="p-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl hover:shadow-md transition-all duration-200 disabled:opacity-50"
+                      >
+                        <Volume2 className="w-4 h-4 text-blue-600" />
+                      </button>
+                    </div>
+                    {agentState === 'thinking' ? (
+                      <div className="flex items-center gap-3 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
+                        <div className="animate-spin w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full"></div>
+                        <p className="text-amber-700 font-medium text-lg">Processing your response...</p>
+                      </div>
+                    ) : (
+                      <div className="p-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200">
+                        <p className="text-gray-800 leading-relaxed text-lg">{currentQuestion}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* User Response Area */}
-          {interviewStarted && (
-            <div className="bg-green-50 rounded-2xl p-6 mb-8">
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-semibold">A</span>
-                </div>
-                <div className="flex-1">
-                  <textarea
-                    className="text-gray-800 leading-relaxed min-h-[60px] w-full bg-transparent border-none  focus:ring-0 resize-none"
-                    value={userResponse}
-                    onChange={e => setUserResponse(e.target.value)}
-                    placeholder="Your response will appear here..."
-                    disabled={isProcessing}
-                  />
-                  {isProcessing && (
-                    <span className="italic text-gray-500">Processing your response...</span>
-                  )}
+            {/* User Response Area */}
+            {interviewStarted && (
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-8 flex-1">
+                <div className="flex items-start gap-4 h-full">
+                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <User className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 flex flex-col h-full">
+                    <div className="flex items-center gap-3 mb-4">
+                      <h3 className="text-xl font-bold text-gray-800">Your Response</h3>
+                      <div className={`px-3 py-1 rounded-xl text-sm font-medium ${isListening ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                        {isListening ? '🎤 Recording...' : '✏️ Type or speak'}
+                      </div>
+                    </div>
+                    <div className="flex-1 p-6 bg-gradient-to-r from-emerald-50 via-green-50 to-teal-50 rounded-2xl border border-emerald-200">
+                      <textarea
+                        className="w-full h-full min-h-[200px] bg-transparent border-none outline-none resize-none text-gray-800 leading-relaxed text-lg placeholder-gray-400"
+                        value={userResponse}
+                        onChange={e => setUserResponse(e.target.value)}
+                        placeholder="Your response will appear here as you speak or type..."
+                        disabled={isProcessing}
+                      />
+                      {isProcessing && (
+                        <div className="mt-4 flex items-center gap-3">
+                          <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                          <span className="italic text-blue-600 font-medium">Processing your response...</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Controls */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+            {/* Welcome Screen for non-started interviews */}
+            {!interviewStarted && (
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-12 text-center flex-1 flex flex-col justify-center">
+                <div className="mb-8">
+                  <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-purple-400 to-blue-500 rounded-full flex items-center justify-center shadow-2xl">
+                    <MessageCircle className="w-16 h-16 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-4">Ready to Start Your Interview?</h2>
+                  <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+                    Get ready to practice with our AI interviewer. This session will help you improve your interview skills
+                    with realistic questions and instant feedback.
+                  </p>
+                </div>
+
+                {/* Instructions */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                  <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
+                    <div className="w-12 h-12 mx-auto mb-4 bg-blue-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white font-bold">1</span>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Listen</h3>
+                    <p className="text-gray-600 text-sm">Alex will ask you interview questions</p>
+                  </div>
+                  <div className="p-6 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200">
+                    <div className="w-12 h-12 mx-auto mb-4 bg-emerald-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white font-bold">2</span>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Respond</h3>
+                    <p className="text-gray-600 text-sm">Answer using voice or text input</p>
+                  </div>
+                  <div className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-200">
+                    <div className="w-12 h-12 mx-auto mb-4 bg-purple-500 rounded-xl flex items-center justify-center">
+                      <span className="text-white font-bold">3</span>
+                    </div>
+                    <h3 className="font-semibold text-gray-800 mb-2">Improve</h3>
+                    <p className="text-gray-600 text-sm">Get feedback and continue learning</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Controls - Fixed at bottom */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-100 p-4 fixed bottom-2 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-3xl">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {!interviewStarted ? (
               <button
                 onClick={startInterview}
-                className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full font-semibold transition-all duration-200 transform hover:scale-105"
+                className="group flex items-center gap-3 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 text-white px-10 py-4 rounded-2xl font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg"
               >
-                <Play size={20} />
-                <span>Start Interview</span>
+                <Play className="w-5 h-5" />
+                <span>Start Interview Session</span>
               </button>
             ) : (
               <>
                 <button
                   onClick={isListening ? stopListening : startListening}
                   disabled={isProcessing || agentState === 'speaking' || agentState === 'thinking'}
-                  className={`flex items-center space-x-2 px-8 py-4 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${isListening
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-green-500 hover:bg-green-600 text-white'
+                  className={`group flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-lg ${isListening
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-2xl shadow-red-500/25'
+                      : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:shadow-2xl shadow-emerald-500/25'
                     }`}
                 >
-                  {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   <span>{isListening ? 'Stop Recording' : 'Start Recording'}</span>
                 </button>
 
                 <button
                   onClick={() => speakQuestion(currentQuestion)}
                   disabled={isProcessing || agentState === 'speaking' || agentState === 'thinking'}
-                  className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group flex items-center gap-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-blue-500/25"
                 >
-                  <Play size={16} />
+                  <Volume2 className="w-5 h-5" />
                   <span>Repeat Question</span>
                 </button>
 
                 <button
                   onClick={() => submitAnswer()}
                   disabled={userResponse.length === 0 || isProcessing || agentState === 'speaking' || agentState === 'thinking'}
-                  className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-4 rounded-full font-semibold transition-all duration-200 transform hover:scale-105 disabled:cursor-not-allowed"
+                  className="group flex items-center gap-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-indigo-500/25"
                 >
-                  <Send size={16} />
+                  <Send className="w-5 h-5" />
                   <span>Submit Answer</span>
                 </button>
               </>
             )}
-          </div>
-
-          {/* Instructions */}
-          <div className="mt-8 p-4 bg-yellow-50 rounded-xl">
-            <h3 className="font-semibold text-gray-800 mb-2">How to use:</h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Click "Start Interview" to begin</li>
-              <li>• Listen to Alex's question (you can repeat it anytime)</li>
-              <li>• Click "Start Recording" to give your answer</li>
-              <li>• Speak clearly and click "Stop Recording" when done</li>
-              <li>• Alex will process your response and ask the next question</li>
-            </ul>
           </div>
         </div>
       </div>
