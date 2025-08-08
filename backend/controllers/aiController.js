@@ -58,4 +58,82 @@ const generateConceptExplanation = async (req, res) => {
     }
 }
 
-module.exports = { generateInterviewQuestions, generateConceptExplanation }
+const generateFirstInterviewQuestion = async (prompt)=>{
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            contents: prompt
+        })
+
+        let rawText = response.candidates[0].content.parts[0].text
+
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
+        return data
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+const generateNextInterviewQuestion = async(prompt, history)=>{
+    try {
+        if (!prompt || !history) {
+            console.log("Prompt and History are required");
+            return null
+        }
+        
+        let chatHistoryForGemini = [];
+        chatHistoryForGemini.push({
+            role: "user",
+            parts: [{ text: prompt }]
+        });
+        history.forEach((item) => {
+            chatHistoryForGemini.push({
+                role: item.role,
+                parts: item.parts
+            });
+        })
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            contents: chatHistoryForGemini
+        })
+        
+        let rawText = response.candidates[0].content.parts[0].text
+
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
+        return data
+
+    } catch (error) {
+        console.log(error);
+        return null
+    }
+}
+
+const generateInterviewFeedback = async (prompt)=>{
+    try {
+        if (!prompt) {
+            console.log("Prompt is required");
+            return null
+        }
+        
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            contents: prompt
+        })
+
+        let rawText = response.candidates[0].content.parts[0].text
+
+        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
+        const data = JSON.parse(cleanedText);
+
+        return data
+    } catch (error) {
+        console.log(error);
+        return null
+    }
+}
+
+module.exports = { generateInterviewQuestions, generateConceptExplanation, generateFirstInterviewQuestion, generateNextInterviewQuestion, generateInterviewFeedback }

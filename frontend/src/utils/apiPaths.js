@@ -29,6 +29,16 @@ export const API_PATHS = {
     AI:{
         GENERATE_QUESTION: "/api/ai/generate-questions",
         GENERATE_EXPLAINATION: "/api/ai/generate-explaination",
+    },
+
+    INTERVIEW:{
+        CREATE: "/api/interview/create",
+        GET_ALL: "/api/interview/my-interviews",
+        GET_ONE: (id) => `/api/interview/${id}`,
+        DELETE: (id) => `/api/interview/${id}`,
+        SUBMIT_ANSWER: (id) => `/api/interview/answer/${id}`,
+        GENERATE_FEEDBACK: (id) => `/api/interview/feedback/${id}`,
+        GET_FEEDBACK: (id) => `/api/interview/feedback/${id}`,
     }
 
 }

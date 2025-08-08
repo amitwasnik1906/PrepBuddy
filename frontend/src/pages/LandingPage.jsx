@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { ChevronRight, CheckCircle, Star, Users, BookOpen, Target, ArrowRight, Menu, X, LogIn, ImageOff } from 'lucide-react'
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Login from "../pages/Auth/Login"
 import SignUp from "../pages/Auth/SignUp"
 import Modal from '../components/modal/Modal'
@@ -23,6 +23,16 @@ function LandingPage() {
     }
     else {
       navigate('/dashboard')
+    }
+  }
+
+  const handleLink = (page, link) => {
+    if (!user) {
+      setOpenAuthModal(true)
+      setCurrentPage(page || "signup")
+    }
+    else {
+      navigate(link)
     }
   }
 
@@ -71,7 +81,7 @@ function LandingPage() {
       <nav className="relative z-50 bg-white/80 backdrop-blur-md border-b border-purple-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2">
+            <div className="hidden sm:flex items-center space-x-2">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center">
                 <Target className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
@@ -80,28 +90,92 @@ function LandingPage() {
               </span>
             </div>
 
+            {/* Hamburger menu for mobile */}
+            <div className="block sm:hidden md:hidden relative z-50 order-first">
+              <button
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                className="p-2 rounded-lg bg-white/40 backdrop-blur-md border border-purple-100 shadow-md focus:outline-none"
+                aria-label="Open navigation menu"
+              >
+                <svg
+                  className="w-7 h-7 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              {/* Mobile menu dropdown */}
+              {mobileMenuOpen && (
+                <div className="absolute left-0 mt-2 w-44 rounded-xl shadow-lg bg-white/80 backdrop-blur-md border border-purple-100 flex flex-col py-2 space-y-1 animate-fade-in z-50">
+                  <div
+                    onClick={(e) => { setMobileMenuOpen(false); handleLink("login", "/"); }}
+                    className="px-5 py-2 text-gray-700 hover:text-purple-600 font-medium transition-colors cursor-pointer rounded-lg hover:bg-purple-50"
+                  >
+                    Home
+                  </div>
+                  <div
+                    onClick={(e) => { setMobileMenuOpen(false); handleLink("login", "/dashboard"); }}
+                    className="px-5 py-2 text-gray-700 hover:text-purple-600 font-medium transition-colors cursor-pointer rounded-lg hover:bg-purple-50"
+                  >
+                    Questions
+                  </div>
+                  <div
+                    onClick={(e) => { setMobileMenuOpen(false); handleLink("login", "/interview/dashboard"); }}
+                    className="px-5 py-2 text-gray-700 hover:text-purple-600 font-medium transition-colors cursor-pointer rounded-lg hover:bg-purple-50"
+                  >
+                    Mock
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop navigation */}
+            <div className="hidden sm:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2">
+              <div
+                onClick={(e) => handleLink("login", "/")}
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors cursor-pointer"
+              >
+                Home
+              </div>
+              <div
+                onClick={(e) => handleLink("login", "/dashboard")}
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors cursor-pointer"
+              >
+                Questions
+              </div>
+              <div
+                onClick={(e) => handleLink("login", "/interview/dashboard")}
+                className="text-gray-700 hover:text-purple-600 font-medium transition-colors cursor-pointer"
+              >
+                Mock
+              </div>
+            </div>
+
             {/* Desktop Navigation */}
             {!user ?
               <div className="items-center space-x-4 sm:space-x-8">
                 <button
-                  onClick={(e)=> handleCTA("login")}
+                  onClick={(e) => handleCTA("login")}
                   className="text-purple-600 hover:text-purple-700 font-medium transition-colors cursor-pointer text-sm sm:text-base"
                 >
                   LogIn
                 </button>
                 <button
-                  onClick={(e)=> handleCTA("signup")}
+                  onClick={(e) => handleCTA("signup")}
                   className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer text-sm sm:text-base"
                 >
                   SignUp
                 </button>
               </div> :
               <div>
-                <ProfileInfoCard/>
+                <ProfileInfoCard />
               </div>
             }
           </div>
-        </div>        
+        </div>
       </nav>
 
       {/* Hero Section */}
@@ -122,7 +196,7 @@ function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
               <button
-                onClick={(e)=> handleCTA("login")}
+                onClick={(e) => handleCTA("login")}
                 className="group bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
               >
                 <span>Start Practicing Free</span>
@@ -193,7 +267,7 @@ function LandingPage() {
       {/* App preview section */}
       <section className='bg-white/50 mb-16'>
         <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <img src="/preview.png" alt="" className='w-full h-full object-cover '/>
+          <img src="/preview.png" alt="" className='w-full h-full object-cover ' />
         </div>
       </section>
 
@@ -240,7 +314,7 @@ function LandingPage() {
             Take your interview preparation to the next level with our AI-powered platform designed to help you succeed.
           </p>
           <button
-            onClick={(e)=> handleCTA("login")}
+            onClick={(e) => handleCTA("login")}
             className="bg-white text-purple-600 px-10 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center space-x-2"
           >
             <span>Start Your Preparation</span>
@@ -292,8 +366,8 @@ function LandingPage() {
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
             <p>&copy; 2025 PrepBuddy . All rights reserved.</p>
           </div>
-          
-          
+
+
         </div>
       </footer>
 
