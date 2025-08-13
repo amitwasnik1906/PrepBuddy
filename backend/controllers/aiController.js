@@ -106,10 +106,7 @@ const generateNextInterviewQuestion = async (prompt, history) => {
 
         console.log(rawText);
 
-        const cleanedText = rawText.replace(/^```json\s*/, "").replace(/```$/, "").trim();
-        const data = JSON.parse(cleanedText);
-        return data
-
+        return {question : rawText}
     } catch (error) {
         console.log(error);
         return null
