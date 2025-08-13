@@ -67,17 +67,12 @@ const nextInterviewQuestionPrompt = () => (`
     You are an AI Interviewer. Your task is to generate the next relevant interview question.
 
     **Instructions:**
-    1.  Generate only ONE interview question.
+    1.  **Generate only ONE interview question.**
     2.  Phrase the question in a natural, conversational tone, as if a human interviewer were speaking.
-    3.  Review the entire chat history provided, paying particular attention to the candidate's last response. Ensure the new question builds upon the conversation, avoids repetition, and probes deeper into the candidate's previous answer or related topics where appropriate, maintaining a natural flow.
-    4.  Do NOT provide any answers, feedback, or conversational filler beyond the question itself.
-    5.  Return the result as a valid JSON object in the following format:
-        {
-            "title": "Short title here?",
-            "question": "question here"
-        }
-       
-    Important: Do NOT add any extra text outside the JSON format. Only return valid JSON.
+    3.  Review the entire chat history provided, paying particular attention to the candidate's last response. Ensure the new question builds upon the conversation, **avoids asking about the same topic again**, and probes deeper where appropriate, maintaining a natural flow.
+    4.  Do NOT provide any answers, feedback, or any conversational text beyond the question itself.
+    5.  Return the question as a plain text string.
+    6.  Do NOT include any extra text, markdown, or code blocks.
 `)
 
 const interviewFeedbackPrompt = ({ jobRole, experience, interviewType, topicsToFocus, formattedInterviewTranscript }) => (`
