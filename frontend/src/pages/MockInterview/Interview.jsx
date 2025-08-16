@@ -17,6 +17,7 @@ const AIMockInterview = () => {
 
   const recognitionRef = useRef(null);
   const synthRef = useRef(null);
+  const shouldContinueListening = useRef(false); // Flag to control continuous listening
 
   const navigate = useNavigate()
   const { interviewId } = useParams()
@@ -32,8 +33,8 @@ const AIMockInterview = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
+      recognitionRef.current.continuous = true; // Changed to true for continuous listening
+      recognitionRef.current.interimResults = true; // Changed to true to get interim results
       recognitionRef.current.lang = 'en-IN';
 
       recognitionRef.current.onstart = () => {
@@ -42,26 +43,76 @@ const AIMockInterview = () => {
       };
 
       recognitionRef.current.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
+        let interimTranscript = '';
+        let finalTranscript = '';
 
-        setUserResponse(prev => (prev + " " + transcript));
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        // Update userResponse with final transcript
+        if (finalTranscript) {
+          setUserResponse(prev => {
+            const newResponse = prev + (prev ? ' ' : '') + finalTranscript;
+            return newResponse;
+          });
+        }
       };
 
       recognitionRef.current.onend = () => {
         setIsListening(false);
-        if (agentState === 'listening') {
-          setAgentState('thinking');
+
+        // Restart recognition if shouldContinueListening is true
+        if (shouldContinueListening.current) {
+          try {
+            recognitionRef.current.start();
+          } catch (error) {
+            console.error('Error restarting recognition:', error);
+            shouldContinueListening.current = false;
+            setAgentState('idle');
+          }
+        } else {
+          setAgentState('idle');
         }
       };
 
       recognitionRef.current.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-        setAgentState('idle');
+
+        // Handle specific errors
+        if (event.error === 'no-speech' && shouldContinueListening.current) {
+          // No speech detected, but user wants to continue listening
+          // Restart recognition after a short delay
+          setTimeout(() => {
+            if (shouldContinueListening.current) {
+              try {
+                recognitionRef.current.start();
+              } catch (error) {
+                console.error('Error restarting after no-speech:', error);
+              }
+            }
+          }, 1000);
+        } else if (event.error === 'aborted') {
+          // Recognition was aborted (likely by user stopping)
+          shouldContinueListening.current = false;
+          setIsListening(false);
+          setAgentState('idle');
+        } else {
+          // Other errors
+          setIsListening(false);
+          setAgentState('idle');
+          shouldContinueListening.current = false;
+        }
       };
     }
 
     return () => {
+      shouldContinueListening.current = false;
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
@@ -109,11 +160,18 @@ const AIMockInterview = () => {
 
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
-      recognitionRef.current.start();
+      shouldContinueListening.current = true;
+      try {
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+        shouldContinueListening.current = false;
+      }
     }
   };
 
   const stopListening = () => {
+    shouldContinueListening.current = false;
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
       setAgentState('idle');
@@ -128,10 +186,11 @@ const AIMockInterview = () => {
 
       // Start the interview
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const firstQuestion = interviewDetails.interviewHistory[1].parts[0].text
+      const len = interviewDetails.interviewHistory.length
+      const firstQuestion = interviewDetails.interviewHistory[len-1].parts[0].text
 
       setCurrentQuestion(firstQuestion);
-      setQuestionCount(1);
+      setQuestionCount(len/2);
       speakQuestion(firstQuestion);
     } catch (error) {
       console.error('Error starting interview:', error);
@@ -142,6 +201,12 @@ const AIMockInterview = () => {
 
   const submitAnswer = async () => {
     try {
+      // Stop listening when submitting answer
+      shouldContinueListening.current = false;
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+
       setIsProcessing(true)
 
       const response = await axiosInstance.post(API_PATHS.INTERVIEW.SUBMIT_ANSWER(interviewId), { answer: userResponse })
@@ -429,8 +494,8 @@ const AIMockInterview = () => {
                   onClick={isListening ? stopListening : startListening}
                   disabled={isProcessing || agentState === 'speaking' || agentState === 'thinking'}
                   className={`group flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-lg ${isListening
-                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-2xl shadow-red-500/25'
-                      : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:shadow-2xl shadow-emerald-500/25'
+                    ? 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-2xl shadow-red-500/25'
+                    : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:shadow-2xl shadow-emerald-500/25'
                     }`}
                 >
                   {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
